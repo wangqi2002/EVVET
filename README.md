@@ -1,4 +1,4 @@
-# <span style="color: #148eb4aa;">e</span><span style="color: #ff40dcaa;">V</span><span style="color: #42b883aa;">V</span><span style="color: #409effaa;">e</span>
+# <span style="color: #148eb4aa;">E</span><span style="color: #ff40dcaa;">V</span><span style="color: #42b883aa;">V</span><span style="color: #409effaa;">E</span><span style="color: #409effaa;">T</span>
 
 一个使用WEB前端技术，融合 electron + Vite + Vue3 + element plus + typescript 的跨端桌面程序集成开发框架，集成的各个组件均来自各组件官方
 
