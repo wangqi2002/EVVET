@@ -1,9 +1,7 @@
 # <span style="color: #148eb4aa;">e</span><span style="color: #ff40dcaa;">V</span><span style="color: #42b883aa;">V</span><span style="color: #409effaa;">e</span>
 
-一个使用WEB前端技术，融合 electron + Vite + Vue3 + element plus 的跨端桌面程序集成开发框架，是作者对号东开发Duihao Jo! 过程中的衍生品，集成的各个组件均来自各组件官方，以最简化方式提供给有需要的朋友，开源且免费提供给个人、企业、单位等包含商业应用在内的任何合法场景使用。
+一个使用WEB前端技术，融合 electron + Vite + Vue3 + element plus + typescript 的跨端桌面程序集成开发框架，集成的各个组件均来自各组件官方
 
-- 官网: <https://evve.duihao.com>
-- 代码: <https://gitee.com/duihao/evve>
 
 ## 技术栈
 
@@ -17,33 +15,33 @@
 ## 安装依赖
 
 ```bash
-pnpm install
+npm install
 
-# npm install
+# pnpm install
 # yarn install
 ```
 
 ### 开发运行
 
 ```bash
-pnpm run dev
+npm run dev
 
-#npm run dev
+#pnpm run dev
 ```
 
 ### 打包EXE
 
 ```bash
-pnpm run build
+npm run build
 
-#npm run build
+#nnpm run build
 ```
 
 ## 拉取代码
 
 ```bash
-git clone https://gitee.com/duihao/evve.git
-cd evve
+git clone https://github.com/wangqi2002/EVVET.git
+cd EVVET
 npm i
 npm run dev
 ```
