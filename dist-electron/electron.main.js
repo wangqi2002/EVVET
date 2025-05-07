@@ -9,8 +9,8 @@ function createWindow() {
     titleBarStyle: "hidden",
     titleBarOverlay: {
       color: "rgba(0, 0, 0, 0)",
-      height: 42,
-      symbolColor: "white"
+      height: 35,
+      symbolColor: "#8B949E"
     },
     // 窗口图标
     icon: join(__dirname, "resource/logo.ico"),

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { repository } from '~/../package.json'
+import { repository } from "~/../package.json";
 
-import { toggleDark } from '~/composables'
+import { toggleDark } from "~/composables";
 </script>
 
 <template>
@@ -9,45 +9,25 @@ import { toggleDark } from '~/composables'
     <el-menu-item index="/">
       <div class="flex items-center justify-center gap-2">
         <div class="text-xl">
-          <img src="../../assets/logo.png" class="logo">
+          <img src="../../assets/logo.png" class="logo" />
         </div>
-        <span>Duihao Jo!</span>
+        <span>AI-Assistant!</span>
       </div>
     </el-menu-item>
     <el-sub-menu index="2">
-      <template #title>
-        Workspace
-      </template>
-      <el-menu-item index="2-1">
-        item one
-      </el-menu-item>
-      <el-menu-item index="2-2">
-        item two
-      </el-menu-item>
-      <el-menu-item index="2-3">
-        item three
-      </el-menu-item>
+      <template #title> Workspace </template>
+      <el-menu-item index="2-1"> item one </el-menu-item>
+      <el-menu-item index="2-2"> item two </el-menu-item>
+      <el-menu-item index="2-3"> item three </el-menu-item>
       <el-sub-menu index="2-4">
-        <template #title>
-          item four
-        </template>
-        <el-menu-item index="2-4-1">
-          item one
-        </el-menu-item>
-        <el-menu-item index="2-4-2">
-          item two
-        </el-menu-item>
-        <el-menu-item index="2-4-3">
-          item three
-        </el-menu-item>
+        <template #title> item four </template>
+        <el-menu-item index="2-4-1"> item one </el-menu-item>
+        <el-menu-item index="2-4-2"> item two </el-menu-item>
+        <el-menu-item index="2-4-3"> item three </el-menu-item>
       </el-sub-menu>
     </el-sub-menu>
-    <el-menu-item index="3" disabled>
-      Info
-    </el-menu-item>
-    <el-menu-item index="4">
-      Orders
-    </el-menu-item>
+    <el-menu-item index="3" disabled> Info </el-menu-item>
+    <el-menu-item index="4"> Orders </el-menu-item>
 
     <el-menu-item h="full" @click="toggleDark()">
       <button
@@ -59,7 +39,11 @@ import { toggleDark } from '~/composables'
     </el-menu-item>
 
     <el-menu-item h="full">
-      <a class="size-full flex items-center justify-center" :href="repository.url" target="_blank">
+      <a
+        class="size-full flex items-center justify-center"
+        :href="repository.url"
+        target="_blank"
+      >
         <div i-ri-github-fill />
       </a>
     </el-menu-item>
@@ -72,6 +56,11 @@ import { toggleDark } from '~/composables'
   //   margin-right: auto;
   // }
   height: 42px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  z-index: 9999;
+  -webkit-app-region: drag;
 
   .logo {
     width: 18px;
