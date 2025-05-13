@@ -24,12 +24,10 @@ function createWindow() {
   });
   if (process.env.VITE_DEV_SERVER_URL) {
     win.loadURL(process.env.VITE_DEV_SERVER_URL);
+    win.webContents.openDevTools({ mode: "right" });
   } else {
     win.loadFile(join(__dirname, "dist/index.html"));
   }
-  globalShortcut.register("Alt+q", () => {
-    win.webContents.openDevTools({ mode: "right" });
-  });
 }
 app.whenReady().then(() => {
   createWindow();

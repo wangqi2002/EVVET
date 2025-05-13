@@ -2,9 +2,14 @@
   <el-config-provider namespace="ep">
     <BaseHeader />
     <div class="main-container flex">
-      <BaseSide />
+      <!-- <BaseSide /> -->
       <div w="full" py="4">
-        <RouterView />
+        <!-- <RouterView /> -->
+        <router-view v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </router-view>
       </div>
     </div>
   </el-config-provider>
