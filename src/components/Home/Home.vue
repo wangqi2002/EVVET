@@ -1,24 +1,26 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
-import { ChatMessage, ChatSession } from "../../../typings";
+import { ChatMessage, ChatSession } from "../../types";
 // import { findChatSessionById, queryChatSession, saveChatSession } from '@/api/chat-session'
-import SessionItem from "@/views/home/components/SessionItem.vue";
+import SessionItem from "../chat/SessionItem.vue";
 import { CirclePlus, Close, EditPen } from "@element-plus/icons-vue";
-import MessageRow from "@/views/home/components/MessageRow.vue";
-import MessageInput from "@/views/home/components/MessageInput.vue";
+import MessageRow from "../chat/MessageRow.vue";
+import MessageInput from "../chat/MessageInput.vue";
 // import { Client } from '@stomp/stompjs'
 import dayjs from "dayjs";
 // import { useUserStore } from '@/stores/user'
 // import { storeToRefs } from 'pinia'
 
 const isEdit = ref(false);
-// const activeSession = ref<Pick<ChatSession, 'id' | 'statistic' | 'messages' | 'topic'>>({
-//   id: '',
-//   topic: '',
-//   statistic: { tokenCount: 0, wordCount: 0, chatCount: 0 },
-//   messages: []
-// })
-// const sessionList = ref([] as ChatSession[])
+const activeSession = ref<
+  Pick<ChatSession, "id" | "statistic" | "messages" | "topic">
+>({
+  id: "",
+  topic: "",
+  statistic: { tokenCount: 0, wordCount: 0, chatCount: 0 },
+  messages: [],
+});
+const sessionList = ref([] as ChatSession[]);
 onMounted(() => {
   console.log("home-in");
   /* // 查询自己的聊天会话
@@ -44,15 +46,17 @@ const handleDeleteSession = (session: ChatSession) => {
 };
 // 新增会话
 const handleCreateSession = async () => {
-  const res = await saveChatSession({ topic: "新的聊天" });
-  sessionList.value.unshift((await findChatSessionById(res.result)).result);
+  console.log("handleCreateSession");
+  //   const res = await saveChatSession({ topic: "新的聊天" });
+  //   sessionList.value.unshift((await findChatSessionById(res.result)).result);
 };
 const handleUpdateSession = () => {
-  saveChatSession(activeSession.value);
-  isEdit.value = false;
+  console.log("handleUpdateSession");
+  //   saveChatSession(activeSession.value);
+  //   isEdit.value = false;
 };
 
-const client = new Client({
+/* const client = new Client({
   brokerURL: "ws://localhost:8080/handshake",
   connectHeaders: {
     token: localStorage.getItem("token") || "",
@@ -67,11 +71,11 @@ const client = new Client({
   },
 });
 // 发起连接
-client.activate();
+client.activate(); */
 // ChatGPT的回复
 const responseMessage = ref({} as ChatMessage);
 const handleSendMessage = (message: string) => {
-  // 新建一个ChatGPT回复对象，不能重复使用同一个对象。
+  /* // 新建一个ChatGPT回复对象，不能重复使用同一个对象。
   responseMessage.value = {
     role: "assistant",
     content: "",
@@ -92,9 +96,15 @@ const handleSendMessage = (message: string) => {
     body: JSON.stringify(chatMessage),
   });
   // 将两条消息显示在页面中
-  activeSession.value.messages.push(...[chatMessage, responseMessage.value]);
+  activeSession.value.messages.push(...[chatMessage, responseMessage.value]); */
 };
-const { userInfo } = storeToRefs(useUserStore());
+// const { userInfo } = storeToRefs(useUserStore());
+const userInfo = ref({
+  avatar: "",
+  nickname: "koko",
+  username: "kokoko",
+  password: "abcABC123",
+});
 </script>
 <template>
   <!-- 最外层页面于窗口同宽，使聊天面板居中 -->
@@ -103,7 +113,7 @@ const { userInfo } = storeToRefs(useUserStore());
     <div class="chat-panel">
       <!-- 左侧的会话列表 -->
       <div class="session-panel">
-        <div class="title">ChatGPT助手</div>
+        <div class="title">ai-assistant</div>
         <div class="description">构建你的AI助手</div>
         <div class="session-list">
           <!-- for循环遍历会话列表用会话组件显示，并监听点击事件和删除事件。点击时切换到被点击的会话，删除时从会话列表中提出被删除的会话。 -->
@@ -145,7 +155,7 @@ const { userInfo } = storeToRefs(useUserStore());
             <!-- 否则正常显示标题 -->
             <div v-else class="title">{{ activeSession.topic }}</div>
             <div class="description">
-              与ChatGPT的{{ activeSession.messages.length }}条对话
+              与ai-assistant的{{ activeSession.messages.length }}条对话
             </div>
           </div>
           <!-- 尾部的编辑按钮 -->
@@ -171,26 +181,30 @@ const { userInfo } = storeToRefs(useUserStore());
           </transition-group>
         </div>
         <!-- 监听发送事件 -->
-        <message-input @send="handleSendMessage"></message-input>
+        <message-input
+          class="input-card"
+          @send="handleSendMessage"
+        ></message-input>
       </div>
     </div>
   </div>
 </template>
 <style lang="scss" scoped>
 .home-view {
-  width: 100vw;
-  display: flex;
-  justify-content: center;
+  width: 100%;
+  height: 100%;
 
   .chat-panel {
+    height: 100%;
     display: flex;
+    justify-content: center;
     border-radius: 20px;
     background-color: white;
     box-shadow: 0 0 20px 20px rgba(black, 0.05);
-    margin-top: 70px;
 
     .session-panel {
-      width: 300px;
+      width: 25%;
+      height: calc(100% - 40px);
       border-top-left-radius: 20px;
       border-bottom-left-radius: 20px;
       padding: 20px;
@@ -237,7 +251,10 @@ const { userInfo } = storeToRefs(useUserStore());
 
     /* 右侧消息记录面板*/
     .message-panel {
-      width: 700px;
+      width: 65%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
 
       .header {
         padding: 20px 20px 0 20px;
@@ -266,7 +283,7 @@ const { userInfo } = storeToRefs(useUserStore());
       }
 
       .message-list {
-        height: 700px;
+        flex: 1;
         padding: 15px;
         // 消息条数太多时，溢出部分滚动
         overflow-y: scroll;
@@ -281,6 +298,10 @@ const { userInfo } = storeToRefs(useUserStore());
           opacity: 0;
           transform: translateX(30px);
         }
+      }
+
+      .input-card {
+        height: 120px;
       }
     }
   }

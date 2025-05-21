@@ -9,6 +9,11 @@
 .ep-message-box {
   --ep-messagebox-border-radius: 10px !important;
 }
+
+.ep-divider--horizontal {
+  margin: 12px 0;
+}
+
 body {
   font-family:
     Inter, system-ui, Avenir, "Helvetica Neue", Helvetica, "PingFang SC",
