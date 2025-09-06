@@ -46,10 +46,5 @@
     "vite": "^6.0.3",
     "vite-ssg": "^0.24.2",
     "vue-tsc": "^2.1.10"
-  },
-  "eslintConfig": {
-    "rules": {
-      "no-console": "off"
-    }
   }
 }

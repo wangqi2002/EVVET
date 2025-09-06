@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { PropType } from "vue";
-import { ChatMessage } from "../../types";
+import { ChatMessage } from "../../typings/types";
 import logo from "../../assets/logo.png";
 import TextLoading from "./TextLoading.vue";
 // message：接受消息对象，展示消息内容和头像，并且根据角色调整消息位置。

@@ -1,11 +1,10 @@
-<!-- eslint-disable no-console -->
 <script lang="ts" setup>
-import type { ChatMessage, ChatSession } from '../../types'
+import type { ChatMessage, ChatSession } from '../../typings/types'
 import { CirclePlus, Close, EditPen } from '@element-plus/icons-vue'
 // import { Client } from '@stomp/stompjs'
 import dayjs from 'dayjs'
 import { onMounted, ref } from 'vue'
-import { chatSessionsData } from '../../util/virtualData'
+import { chatSessionsData } from '../../utils/virtualData'
 import MessageInput from '../chat/MessageInput.vue'
 // import { useUserStore } from '@/stores/user'
 // import { storeToRefs } from 'pinia'

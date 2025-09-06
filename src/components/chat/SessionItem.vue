@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ChatSession } from '../../types'
+import type { ChatSession } from '../../typings/types'
 import { CircleClose } from '@element-plus/icons-vue'
 // import { deleteChatSession } from '@/api/chat-session'
 // active：用来标记当前会话是否处于选中状态

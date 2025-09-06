@@ -1,4 +1,4 @@
-import type { UserModule } from './types'
+import type { UserModule } from './typings/types'
 
 // import { app, BrowserWindow } from 'electron'
 import { ViteSSG } from 'vite-ssg'
