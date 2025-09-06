@@ -5,12 +5,14 @@ import { CirclePlus, Close, EditPen } from '@element-plus/icons-vue'
 // import { Client } from '@stomp/stompjs'
 import dayjs from 'dayjs'
 import { onMounted, ref } from 'vue'
+import { chatSessionsData } from '../../util/virtualData'
 import MessageInput from '../chat/MessageInput.vue'
+// import { useUserStore } from '@/stores/user'
+// import { storeToRefs } from 'pinia'
+
 import MessageRow from '../chat/MessageRow.vue'
 // import { findChatSessionById, queryChatSession, saveChatSession } from '@/api/chat-session'
 import SessionItem from '../chat/SessionItem.vue'
-// import { useUserStore } from '@/stores/user'
-// import { storeToRefs } from 'pinia'
 
 const isEdit = ref(false)
 const activeSession = ref<
@@ -24,6 +26,8 @@ const activeSession = ref<
 const sessionList = ref([] as ChatSession[])
 onMounted(() => {
   console.log('home-in')
+  console.log(chatSessionsData)
+  sessionList.value.push(...chatSessionsData)
   /* // 查询自己的聊天会话
   queryChatSession({ pageSize: 1000, pageNum: 1, query: {} }).then((res) => {
     // 讲会话添加到列表中
@@ -125,9 +129,13 @@ const userInfo = ref({
           <!-- for循环遍历会话列表用会话组件显示，并监听点击事件和删除事件。点击时切换到被点击的会话，删除时从会话列表中提出被删除的会话。 -->
           <!--  -->
           <SessionItem
-            v-for="(session, index) in sessionList" :key="session.id"
-            :active="session.id === activeSession.id" :session="sessionList[index]" class="session"
-            @click="handleSessionSwitch(session)" @delete="handleDeleteSession"
+            v-for="(session, index) in sessionList"
+            :key="session.id"
+            :active="session.id === activeSession.id"
+            :session="sessionList[index]"
+            class="session"
+            @click="handleSessionSwitch(session)"
+            @delete="handleDeleteSession"
           />
         </div>
         <div class="button-wrapper">
@@ -149,7 +157,10 @@ const userInfo = ref({
             <!-- 如果处于编辑状态则显示输入框让用户去修改 -->
             <div v-if="isEdit" class="title">
               <!-- 按回车代表确认修改 -->
-              <el-input v-model="activeSession.topic" @keydown.enter="handleUpdateSession" />
+              <el-input
+                v-model="activeSession.topic"
+                @keydown.enter="handleUpdateSession"
+              />
             </div>
             <!-- 否则正常显示标题 -->
             <div v-else class="title">
@@ -174,8 +185,10 @@ const userInfo = ref({
           <!-- 过渡效果 -->
           <transition-group name="list">
             <MessageRow
-              v-for="(message, index) in activeSession.messages" :key="message.createdAt + index"
-              :avatar="userInfo.avatar" :message="message"
+              v-for="(message, index) in activeSession.messages"
+              :key="message.createdAt + index"
+              :avatar="userInfo.avatar"
+              :message="message"
             />
           </transition-group>
         </div>
