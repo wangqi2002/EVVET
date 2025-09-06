@@ -1,11 +1,12 @@
 import path, { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, globalShortcut } from "electron";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+let win;
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "false";
 function createWindow() {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     titleBarStyle: "hidden",
     titleBarOverlay: {
       color: "rgba(0, 0, 0, 0)",
@@ -24,7 +25,7 @@ function createWindow() {
   });
   if (process.env.VITE_DEV_SERVER_URL) {
     win.loadURL(process.env.VITE_DEV_SERVER_URL);
-    win.webContents.openDevTools({ mode: "right" });
+    win.webContents.openDevTools({ mode: "rights" });
   } else {
     win.loadFile(join(__dirname, "dist/index.html"));
   }
@@ -34,6 +35,11 @@ app.whenReady().then(() => {
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0)
       createWindow();
+  });
+});
+app.on("ready", () => {
+  globalShortcut.register("Alt+k", () => {
+    win.webContents.openDevTools({ mode: "rights" });
   });
 });
 app.on("window-all-closed", () => {

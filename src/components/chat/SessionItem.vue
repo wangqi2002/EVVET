@@ -1,40 +1,44 @@
 <script lang="ts" setup>
-import { CircleClose } from "@element-plus/icons-vue";
-import { ChatSession } from "../../types";
+import type { ChatSession } from '../../types'
+import { CircleClose } from '@element-plus/icons-vue'
 // import { deleteChatSession } from '@/api/chat-session'
 // active：用来标记当前会话是否处于选中状态
 // session：用于展示的会话信息
-const prop = defineProps<{ active: boolean; session: ChatSession }>();
+const prop = defineProps<{ active: boolean, session: ChatSession }>()
 // 定义删除事件，当触发删除事件时会向外部发送被删除的会话。
 const emit = defineEmits<{
-  delete: [session: ChatSession];
-}>();
+  delete: [session: ChatSession]
+}>()
 // 当鼠标放到会话上时，会弹出删除图标，点击删除图标调用删除接口并发送删除事件。
-const handleDeleteSession = () => {
-  console.log("handleDeleteSession");
+function handleDeleteSession() {
+  console.log('handleDeleteSession')
   //   deleteChatSession([prop.session.id]).then((res) => {
   //     if (res.success) {
   //       // 发送删除事件
   //       emit('delete', prop.session)
   //     }
   //   })
-};
+}
 </script>
 
 <template>
   <!-- 如果处于激活状态则增加 active class -->
-  <div :class="['session-item', active ? 'active' : '']">
+  <div class="session-item" :class="[active ? 'active' : '']">
     <!-- 会话的名称 -->
-    <div class="name">{{ session.topic }}</div>
+    <div class="name">
+      {{ session.topic }}
+    </div>
     <!-- 会话内的消息数量和最近修改的时间 -->
     <div class="count-time">
       <div class="count">
         {{ session.messages ? session.messages.length : 0 }}条对话
       </div>
-      <div class="time">{{ session.updatedAt }}</div>
+      <div class="time">
+        {{ session.updatedAt }}
+      </div>
     </div>
     <!-- 当鼠标放在会话上时会弹出遮罩 -->
-    <div class="mask"></div>
+    <div class="mask" />
     <!-- 当鼠标放在会话上时会弹出删除按钮 -->
     <div class="btn-wrapper">
       <el-icon :size="15" class="close">

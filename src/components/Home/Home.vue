@@ -1,28 +1,29 @@
+<!-- eslint-disable no-console -->
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
-import { ChatMessage, ChatSession } from "../../types";
-// import { findChatSessionById, queryChatSession, saveChatSession } from '@/api/chat-session'
-import SessionItem from "../chat/SessionItem.vue";
-import { CirclePlus, Close, EditPen } from "@element-plus/icons-vue";
-import MessageRow from "../chat/MessageRow.vue";
-import MessageInput from "../chat/MessageInput.vue";
+import type { ChatMessage, ChatSession } from '../../types'
+import { CirclePlus, Close, EditPen } from '@element-plus/icons-vue'
 // import { Client } from '@stomp/stompjs'
-import dayjs from "dayjs";
+import dayjs from 'dayjs'
+import { onMounted, ref } from 'vue'
+import MessageInput from '../chat/MessageInput.vue'
+import MessageRow from '../chat/MessageRow.vue'
+// import { findChatSessionById, queryChatSession, saveChatSession } from '@/api/chat-session'
+import SessionItem from '../chat/SessionItem.vue'
 // import { useUserStore } from '@/stores/user'
 // import { storeToRefs } from 'pinia'
 
-const isEdit = ref(false);
+const isEdit = ref(false)
 const activeSession = ref<
-  Pick<ChatSession, "id" | "statistic" | "messages" | "topic">
+  Pick<ChatSession, 'id' | 'statistic' | 'messages' | 'topic'>
 >({
-  id: "",
-  topic: "",
+  id: '',
+  topic: '',
   statistic: { tokenCount: 0, wordCount: 0, chatCount: 0 },
   messages: [],
-});
-const sessionList = ref([] as ChatSession[]);
+})
+const sessionList = ref([] as ChatSession[])
 onMounted(() => {
-  console.log("home-in");
+  console.log('home-in')
   /* // 查询自己的聊天会话
   queryChatSession({ pageSize: 1000, pageNum: 1, query: {} }).then((res) => {
     // 讲会话添加到列表中
@@ -32,29 +33,29 @@ onMounted(() => {
       activeSession.value = sessionList.value[0]
     }
   }) */
-});
+})
 // 切换会话
-const handleSessionSwitch = (session: ChatSession) => {
-  activeSession.value = session;
-};
+function handleSessionSwitch(session: ChatSession) {
+  activeSession.value = session
+}
 // 从会话列表中删除会话
-const handleDeleteSession = (session: ChatSession) => {
+function handleDeleteSession(session: ChatSession) {
   const index = sessionList.value.findIndex((value) => {
-    return value.id === session.id;
-  });
-  sessionList.value.splice(index, 1);
-};
+    return value.id === session.id
+  })
+  sessionList.value.splice(index, 1)
+}
 // 新增会话
-const handleCreateSession = async () => {
-  console.log("handleCreateSession");
+async function handleCreateSession() {
+  console.log('handleCreateSession')
   //   const res = await saveChatSession({ topic: "新的聊天" });
   //   sessionList.value.unshift((await findChatSessionById(res.result)).result);
-};
-const handleUpdateSession = () => {
-  console.log("handleUpdateSession");
+}
+function handleUpdateSession() {
+  console.log('handleUpdateSession')
   //   saveChatSession(activeSession.value);
   //   isEdit.value = false;
-};
+}
 
 /* const client = new Client({
   brokerURL: "ws://localhost:8080/handshake",
@@ -73,8 +74,8 @@ const handleUpdateSession = () => {
 // 发起连接
 client.activate(); */
 // ChatGPT的回复
-const responseMessage = ref({} as ChatMessage);
-const handleSendMessage = (message: string) => {
+const responseMessage = ref({} as ChatMessage)
+function handleSendMessage(message: string) {
   /* // 新建一个ChatGPT回复对象，不能重复使用同一个对象。
   responseMessage.value = {
     role: "assistant",
@@ -97,15 +98,16 @@ const handleSendMessage = (message: string) => {
   });
   // 将两条消息显示在页面中
   activeSession.value.messages.push(...[chatMessage, responseMessage.value]); */
-};
+}
 // const { userInfo } = storeToRefs(useUserStore());
 const userInfo = ref({
-  avatar: "",
-  nickname: "koko",
-  username: "kokoko",
-  password: "abcABC123",
-});
+  avatar: '',
+  nickname: 'koko',
+  username: 'kokoko',
+  password: 'abcABC123',
+})
 </script>
+
 <template>
   <!-- 最外层页面于窗口同宽，使聊天面板居中 -->
   <div class="home-view">
@@ -113,20 +115,20 @@ const userInfo = ref({
     <div class="chat-panel">
       <!-- 左侧的会话列表 -->
       <div class="session-panel">
-        <div class="title">ai-assistant</div>
-        <div class="description">构建你的AI助手</div>
+        <div class="title">
+          ai-assistant
+        </div>
+        <div class="description">
+          构建你的AI助手
+        </div>
         <div class="session-list">
           <!-- for循环遍历会话列表用会话组件显示，并监听点击事件和删除事件。点击时切换到被点击的会话，删除时从会话列表中提出被删除的会话。 -->
           <!--  -->
           <SessionItem
-            v-for="(session, index) in sessionList"
-            :key="session.id"
-            :active="session.id === activeSession.id"
-            :session="sessionList[index]"
-            class="session"
-            @click="handleSessionSwitch(session)"
-            @delete="handleDeleteSession"
-          ></SessionItem>
+            v-for="(session, index) in sessionList" :key="session.id"
+            :active="session.id === activeSession.id" :session="sessionList[index]" class="session"
+            @click="handleSessionSwitch(session)" @delete="handleDeleteSession"
+          />
         </div>
         <div class="button-wrapper">
           <div class="new-session">
@@ -147,13 +149,12 @@ const userInfo = ref({
             <!-- 如果处于编辑状态则显示输入框让用户去修改 -->
             <div v-if="isEdit" class="title">
               <!-- 按回车代表确认修改 -->
-              <el-input
-                v-model="activeSession.topic"
-                @keydown.enter="handleUpdateSession"
-              ></el-input>
+              <el-input v-model="activeSession.topic" @keydown.enter="handleUpdateSession" />
             </div>
             <!-- 否则正常显示标题 -->
-            <div v-else class="title">{{ activeSession.topic }}</div>
+            <div v-else class="title">
+              {{ activeSession.topic }}
+            </div>
             <div class="description">
               与ai-assistant的{{ activeSession.messages.length }}条对话
             </div>
@@ -164,41 +165,37 @@ const userInfo = ref({
               <!-- 不处于编辑状态显示编辑按钮 -->
               <EditPen v-if="!isEdit" @click="isEdit = true" />
               <!-- 处于编辑状态显示取消编辑按钮 -->
-              <Close v-else @click="isEdit = false"></Close>
+              <Close v-else @click="isEdit = false" />
             </el-icon>
           </div>
         </div>
-        <el-divider :border-style="'solid'" />
+        <el-divider border-style="solid" />
         <div class="message-list">
           <!-- 过渡效果 -->
           <transition-group name="list">
-            <message-row
-              v-for="(message, index) in activeSession.messages"
-              :key="message.createdAt + index"
-              :avatar="userInfo.avatar"
-              :message="message"
-            ></message-row>
+            <MessageRow
+              v-for="(message, index) in activeSession.messages" :key="message.createdAt + index"
+              :avatar="userInfo.avatar" :message="message"
+            />
           </transition-group>
         </div>
         <!-- 监听发送事件 -->
-        <message-input
-          class="input-card"
-          @send="handleSendMessage"
-        ></message-input>
+        <MessageInput class="input-card" @send="handleSendMessage" />
       </div>
     </div>
   </div>
 </template>
+
 <style lang="scss" scoped>
 .home-view {
   width: 100%;
-  height: 100%;
+  height: calc(100% - 2px);
 
   .chat-panel {
     height: 100%;
     display: flex;
     justify-content: center;
-    border-radius: 20px;
+    // border-radius: 20px;
     background-color: white;
     box-shadow: 0 0 20px 20px rgba(black, 0.05);
 
@@ -211,10 +208,12 @@ const userInfo = ref({
       position: relative;
       border-right: 1px solid rgba(black, 0.07);
       background-color: rgb(231, 248, 255);
+
       /* 标题 */
       .title {
         margin-top: 20px;
         font-size: 20px;
+        color: rgba(black, 0.7);
       }
 
       /* 描述*/
@@ -253,6 +252,9 @@ const userInfo = ref({
     .message-panel {
       width: 65%;
       height: 100%;
+      border-right: 1px solid rgba(0, 0, 0, 0.07);
+      border-top-right-radius: 5px;
+      border-top-left-radius: 5px;
       display: flex;
       flex-direction: column;
 
@@ -287,6 +289,7 @@ const userInfo = ref({
         padding: 15px;
         // 消息条数太多时，溢出部分滚动
         overflow-y: scroll;
+
         // 当切换聊天会话时，消息记录也随之切换的过渡效果
         .list-enter-active,
         .list-leave-active {

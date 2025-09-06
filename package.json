@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@9.15.0",
-  "description": "一个使用WEB前端技术，融合 electron + Vite + Vue3 + element plus + TypeScript 的跨端桌面程序集成开发框架",
+  "description": "一个使用WEB前端技术,融合 electron + Vite + Vue3 + element plus + TypeScript 的跨端桌面程序集成开发框架",
   "license": "MIT",
   "repository": {
     "url": "https://github.com/wangqi2002/EVVET.git"
@@ -46,5 +46,10 @@
     "vite": "^6.0.3",
     "vite-ssg": "^0.24.2",
     "vue-tsc": "^2.1.10"
+  },
+  "eslintConfig": {
+    "rules": {
+      "no-console": "off"
+    }
   }
 }
