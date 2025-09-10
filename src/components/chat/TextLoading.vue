@@ -1,9 +1,9 @@
 <template>
   <div class="loading">
     <!--  三个 div 三个黑点 -->
-    <div></div>
-    <div></div>
-    <div></div>
+    <div />
+    <div />
+    <div />
   </div>
 </template>
 

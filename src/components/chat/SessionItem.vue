@@ -63,7 +63,7 @@ function handleDeleteSession() {
   /* 给边界一些圆角看起来圆润一些 */
   border-radius: 10px;
   /* 固定宽度 */
-  width: 250px;
+  // width: 250px;
   /* 当鼠标放在会话上时改变鼠标的样式，暗示用户可以点击。目前还没做拖动的效果，以后会做。 */
   cursor: grab;
   /* 父相子绝，父元素是相对布局的情况下，子元素的绝对布局是相当于父元素绝对布局。 */
@@ -76,7 +76,7 @@ function handleDeleteSession() {
     font-size: 14px;
     /* 凸显名称，加粗 */
     font-weight: 700;
-    width: 200px;
+    // width: 200px;
     /* 加粗后颜色淡一些 */
     color: rgba(black, 0.8);
   }

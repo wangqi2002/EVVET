@@ -1,6 +1,6 @@
 import type { ChatSession } from '../typings/types'
 
-export const chatSessions: ChatSession[] = [
+export const chatSessionsData: ChatSession[] = [
   {
     id: 'session-1',
     topic: 'AI助手介绍',
@@ -114,6 +114,42 @@ export const chatSessions: ChatSession[] = [
       },
       {
         id: 'msg-7',
+        content: '可以使用Set结构：const uniqueArr = [...new Set(arr)]。',
+        role: 'assistant',
+        session: undefined as any,
+        validStatus: 'VALID',
+        updatedAt: '2025-09-06T12:00:03Z',
+        createdAt: '2025-09-06T12:00:03Z',
+      },
+      {
+        id: 'msg-8',
+        content: '如何用JavaScript实现数组去重？',
+        role: 'user',
+        session: undefined as any,
+        validStatus: 'VALID',
+        updatedAt: '2025-09-06T12:00:00Z',
+        createdAt: '2025-09-06T12:00:00Z',
+      },
+      {
+        id: 'msg-9',
+        content: '可以使用Set结构：const uniqueArr = [...new Set(arr)]。',
+        role: 'assistant',
+        session: undefined as any,
+        validStatus: 'VALID',
+        updatedAt: '2025-09-06T12:00:03Z',
+        createdAt: '2025-09-06T12:00:03Z',
+      },
+      {
+        id: 'msg-10',
+        content: '如何用JavaScript实现数组去重？',
+        role: 'user',
+        session: undefined as any,
+        validStatus: 'VALID',
+        updatedAt: '2025-09-06T12:00:00Z',
+        createdAt: '2025-09-06T12:00:00Z',
+      },
+      {
+        id: 'msg-11',
         content: '可以使用Set结构：const uniqueArr = [...new Set(arr)]。',
         role: 'assistant',
         session: undefined as any,

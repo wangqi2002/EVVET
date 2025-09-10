@@ -1,3 +1,4 @@
+<!-- eslint-disable no-console -->
 <script lang="ts" setup>
 import type { ChatMessage, ChatSession } from '../../typings/types'
 import { CirclePlus, Close, EditPen } from '@element-plus/icons-vue'
@@ -25,7 +26,6 @@ const activeSession = ref<
 const sessionList = ref([] as ChatSession[])
 onMounted(() => {
   console.log('home-in')
-  console.log(chatSessionsData)
   sessionList.value.push(...chatSessionsData)
   /* // 查询自己的聊天会话
   queryChatSession({ pageSize: 1000, pageNum: 1, query: {} }).then((res) => {
@@ -79,6 +79,7 @@ client.activate(); */
 // ChatGPT的回复
 const responseMessage = ref({} as ChatMessage)
 function handleSendMessage(message: string) {
+  console.log('handleSendMessage')
   /* // 新建一个ChatGPT回复对象，不能重复使用同一个对象。
   responseMessage.value = {
     role: "assistant",
@@ -104,7 +105,7 @@ function handleSendMessage(message: string) {
 }
 // const { userInfo } = storeToRefs(useUserStore());
 const userInfo = ref({
-  avatar: '',
+  avatar: 'src/assets/avatar.png',
   nickname: 'koko',
   username: 'kokoko',
   password: 'abcABC123',
