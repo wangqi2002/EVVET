@@ -1,8 +1,6 @@
 import CryptoJS from 'crypto-js'
 import { computed, ref } from 'vue'
 
-// TODO 自己去讯飞官网获获取 apiKey、apiSecret、app_id 等信息
-
 const apiKey = '1b0cc8a5873adc1a86126bf632754702'
 const apiSecret = 'NGM5MWU1YmY2OWI0YjY5OTYxNzRjYjI1'
 const app_id = 'b3095f22'
