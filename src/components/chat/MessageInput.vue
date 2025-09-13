@@ -1,17 +1,38 @@
 <script lang="ts" setup>
 import { Position } from '@element-plus/icons-vue'
 import { ref } from 'vue'
+// import { useXfAsr } from '../../utils/useXfAsr'
 
 // 发送消息消息事件
 const emit = defineEmits<{
   send: [message: string]
 }>()
+
+// const { startRecording, stopRecording, recordText, resultText } = useXfAsr()
+
 // 输入框内的消息
 const message = ref('')
+const isListening = ref(false)
+const timeOutEvent = ref<ReturnType<typeof setTimeout> | null>(null)
 function sendMessage() {
   emit('send', message.value)
   // 发送完清除
   message.value = ''
+}
+function goTouchstart() {
+  timeOutEvent.value = setTimeout(() => {
+    isListening.value = true
+    console.log('开始录音')
+    // startRecording()
+  }, 200) // 长按200毫秒后，触发长按事件
+}
+// 手如果在200毫秒内就释放，则取消长按事件
+function goTouchend() {
+  if (timeOutEvent.value) {
+    clearTimeout(timeOutEvent.value)
+    timeOutEvent.value = null
+    console.log('结束录音')
+  }
 }
 </script>
 
@@ -29,6 +50,18 @@ function sendMessage() {
         @keydown.enter="sendMessage"
       />
       <div class="button-wrapper">
+        <el-button
+          type="primary"
+          @mousedown.prevent="goTouchstart()"
+          @mouseup.prevent="goTouchend()"
+          @touchstart.prevent="goTouchstart()"
+          @touchend.prevent="goTouchend()"
+        >
+          <el-icon class="el-icon--left">
+            <Position />
+          </el-icon>
+          录音
+        </el-button>
         <el-button type="primary" @click="sendMessage">
           <el-icon class="el-icon--left">
             <Position />
