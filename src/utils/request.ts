@@ -1,8 +1,7 @@
 import type { Method } from 'axios'
-import type { Result } from '../../typings'
+import type { Result } from '../typings/types'
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
-import router from '../router'
 
 const baseUrl = '/api'
 const http = axios.create({
@@ -10,8 +9,8 @@ const http = axios.create({
   timeout: 10000,
 })
 http.interceptors.request.use((request) => {
-  const token = window.localStorage.getItem('token')
-  request.headers.set('token', token ?? '')
+  // const token = window.localStorage.getItem('token')
+  // request.headers.set('token', token ?? '')
   return request
 })
 http.interceptors.response.use(
@@ -21,9 +20,6 @@ http.interceptors.response.use(
   ({ response }) => {
     if (response.data.code !== 1) {
       ElMessage.warning({ message: response.data.msg })
-    }
-    if (response.data.code === 1001007 || response.data.code === 1001008) {
-      void router.push('/login')
     }
     else {
       /* empty */

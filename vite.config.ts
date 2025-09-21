@@ -16,9 +16,16 @@ export default defineConfig({
     emptyOutDir: true, // 清空输出目录
   },
   server: {
-    port: 3000,
+    // port: 3000,
     open: false, // 不自动打开浏览器
     host: true, // 允许局域网访问
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, ''),
+      },
+    },
   },
   define: {
     'process.env': {

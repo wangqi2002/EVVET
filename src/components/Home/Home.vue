@@ -5,10 +5,11 @@ import { CirclePlus, Close, EditPen } from '@element-plus/icons-vue'
 // import { Client } from '@stomp/stompjs'
 import dayjs from 'dayjs'
 import { onMounted, ref } from 'vue'
-import { chatSessionsData } from '../../utils/virtualData'
-import MessageInput from '../chat/MessageInput.vue'
 // import { useUserStore } from '@/stores/user'
 // import { storeToRefs } from 'pinia'
+import { getstring } from '~/api/demo'
+import { chatSessionsData } from '../../utils/virtualData'
+import MessageInput from '../chat/MessageInput.vue'
 
 import MessageRow from '../chat/MessageRow.vue'
 // import { findChatSessionById, queryChatSession, saveChatSession } from '@/api/chat-session'
@@ -80,6 +81,9 @@ client.activate(); */
 const responseMessage = ref({} as ChatMessage)
 function handleSendMessage(message: string) {
   console.log('handleSendMessage')
+  const data = getstring()
+  console.log(data)
+
   /* // 新建一个ChatGPT回复对象，不能重复使用同一个对象。
   responseMessage.value = {
     role: "assistant",
