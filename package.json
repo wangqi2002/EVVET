@@ -37,7 +37,7 @@
     "@unocss/eslint-plugin": "^0.65.1",
     "@vitejs/plugin-vue": "^5.2.1",
     "concurrently": "^9.1.2",
-    "electron": "^35.0.0",
+    "electron": "^35.7.5",
     "electron-builder": "^25.1.8",
     "eslint": "^9.16.0",
     "eslint-plugin-format": "^0.1.3",

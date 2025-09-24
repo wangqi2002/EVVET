@@ -19,6 +19,7 @@ declare module 'vue' {
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
     ElPopconfirm: typeof import('element-plus/es')['ElPopconfirm']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
+    FloatingWindow: typeof import('./components/FloatingWindow.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     Home: typeof import('./components/Home/Home.vue')['default']
     Logos: typeof import('./components/Logos.vue')['default']

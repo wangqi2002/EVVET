@@ -18,6 +18,7 @@ function createWindow() {
     width: 1024,
     height: 768,
     webPreferences: {
+      devTools: true
       // contextIsolation: false,
       // nodeIntegration: true,
       // preload: path.join(__dirname, 'preload.js')
@@ -39,7 +40,12 @@ app.whenReady().then(() => {
 });
 app.on("ready", () => {
   globalShortcut.register("Alt+k", () => {
-    win.webContents.openDevTools({ mode: "rights" });
+    win.webContents.openDevTools();
+    console.log("Alt+k is pressed");
+    console.log(win.webContents.openDevTools);
+    win.webContents.on("devtools-opened", () => {
+      console.log("DevTools 已打开事件触发");
+    });
   });
 });
 app.on("window-all-closed", () => {

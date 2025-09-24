@@ -18,6 +18,7 @@ function sendMessage() {
   emit('send', message.value)
   // 发送完清除
   message.value = ''
+  message.value = '哈哈哈哈哈哈哈哈哈'
 }
 function goTouchstart() {
   timeOutEvent.value = setTimeout(() => {

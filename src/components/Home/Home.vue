@@ -1,33 +1,34 @@
 <!-- eslint-disable no-console -->
 <script lang="ts" setup>
-import type { ChatMessage, ChatSession } from '../../typings/types'
-import { CirclePlus, Close, EditPen } from '@element-plus/icons-vue'
+import type { ChatMessage, ChatSession } from "../../typings/types";
+import { CirclePlus, Close, EditPen } from "@element-plus/icons-vue";
 // import { Client } from '@stomp/stompjs'
-import dayjs from 'dayjs'
-import { onMounted, ref } from 'vue'
+import dayjs from "dayjs";
+import { onMounted, ref } from "vue";
 // import { useUserStore } from '@/stores/user'
 // import { storeToRefs } from 'pinia'
-import { getstring } from '~/api/demo'
-import { chatSessionsData } from '../../utils/virtualData'
-import MessageInput from '../chat/MessageInput.vue'
+import { getstring } from "~/api/demo";
+import { chatSessionsData } from "../../utils/virtualData";
+import MessageInput from "../chat/MessageInput.vue";
 
-import MessageRow from '../chat/MessageRow.vue'
+import MessageRow from "../chat/MessageRow.vue";
+import FloatingWindow from "../FloatingWindow.vue";
 // import { findChatSessionById, queryChatSession, saveChatSession } from '@/api/chat-session'
-import SessionItem from '../chat/SessionItem.vue'
+import SessionItem from "../chat/SessionItem.vue";
 
-const isEdit = ref(false)
+const isEdit = ref(false);
 const activeSession = ref<
-  Pick<ChatSession, 'id' | 'statistic' | 'messages' | 'topic'>
+  Pick<ChatSession, "id" | "statistic" | "messages" | "topic">
 >({
-  id: '',
-  topic: '',
+  id: "",
+  topic: "",
   statistic: { tokenCount: 0, wordCount: 0, chatCount: 0 },
   messages: [],
-})
-const sessionList = ref([] as ChatSession[])
+});
+const sessionList = ref([] as ChatSession[]);
 onMounted(() => {
-  console.log('home-in')
-  sessionList.value.push(...chatSessionsData)
+  console.log("home-in");
+  sessionList.value.push(...chatSessionsData);
   /* // 查询自己的聊天会话
   queryChatSession({ pageSize: 1000, pageNum: 1, query: {} }).then((res) => {
     // 讲会话添加到列表中
@@ -37,26 +38,26 @@ onMounted(() => {
       activeSession.value = sessionList.value[0]
     }
   }) */
-})
+});
 // 切换会话
 function handleSessionSwitch(session: ChatSession) {
-  activeSession.value = session
+  activeSession.value = session;
 }
 // 从会话列表中删除会话
 function handleDeleteSession(session: ChatSession) {
   const index = sessionList.value.findIndex((value) => {
-    return value.id === session.id
-  })
-  sessionList.value.splice(index, 1)
+    return value.id === session.id;
+  });
+  sessionList.value.splice(index, 1);
 }
 // 新增会话
 async function handleCreateSession() {
-  console.log('handleCreateSession')
+  console.log("handleCreateSession");
   //   const res = await saveChatSession({ topic: "新的聊天" });
   //   sessionList.value.unshift((await findChatSessionById(res.result)).result);
 }
 function handleUpdateSession() {
-  console.log('handleUpdateSession')
+  console.log("handleUpdateSession");
   //   saveChatSession(activeSession.value);
   //   isEdit.value = false;
 }
@@ -78,11 +79,11 @@ function handleUpdateSession() {
 // 发起连接
 client.activate(); */
 // ChatGPT的回复
-const responseMessage = ref({} as ChatMessage)
+const responseMessage = ref({} as ChatMessage);
 function handleSendMessage(message: string) {
-  console.log('handleSendMessage')
-  const data = getstring()
-  console.log(data)
+  console.log("handleSendMessage");
+  // const data = getstring()
+  // console.log(data)
 
   /* // 新建一个ChatGPT回复对象，不能重复使用同一个对象。
   responseMessage.value = {
@@ -109,11 +110,11 @@ function handleSendMessage(message: string) {
 }
 // const { userInfo } = storeToRefs(useUserStore());
 const userInfo = ref({
-  avatar: 'src/assets/avatar.png',
-  nickname: 'koko',
-  username: 'kokoko',
-  password: 'abcABC123',
-})
+  avatar: "src/assets/avatar.png",
+  nickname: "koko",
+  username: "kokoko",
+  password: "abcABC123",
+});
 </script>
 
 <template>
@@ -123,12 +124,8 @@ const userInfo = ref({
     <div class="chat-panel">
       <!-- 左侧的会话列表 -->
       <div class="session-panel">
-        <div class="title">
-          ai-assistant
-        </div>
-        <div class="description">
-          构建你的AI助手
-        </div>
+        <div class="title">ai-assistant</div>
+        <div class="description">构建你的AI助手</div>
         <div class="session-list">
           <!-- for循环遍历会话列表用会话组件显示，并监听点击事件和删除事件。点击时切换到被点击的会话，删除时从会话列表中提出被删除的会话。 -->
           <!--  -->
@@ -201,6 +198,17 @@ const userInfo = ref({
       </div>
     </div>
   </div>
+  <FloatingWindow :width="360" :maxHeight="300" :initialX="200" :initialY="120">
+    <template #title>工具窗口</template>
+    <div>
+      <p>这是一个可拖拽的浮动窗口。你可以把它移动到任意位置。</p>
+      <p>下面演示较多内容，使内容区域产生竖向滚动。</p>
+      <ul>
+        <li v-for="i in 20" :key="i">示例行 - 内容项 {{ i }}</li>
+      </ul>
+      <p>你可以在这里放任意信息：日志、帮助文本、快捷操作或列表等。</p>
+    </div>
+  </FloatingWindow>
 </template>
 
 <style lang="scss" scoped>
