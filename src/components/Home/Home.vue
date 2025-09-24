@@ -81,8 +81,8 @@ client.activate(); */
 const responseMessage = ref({} as ChatMessage)
 function handleSendMessage(message: string) {
   console.log('handleSendMessage')
-  const data = getstring()
-  console.log(data)
+  // const data = getstring()
+  // console.log(data)
 
   /* // 新建一个ChatGPT回复对象，不能重复使用同一个对象。
   responseMessage.value = {
