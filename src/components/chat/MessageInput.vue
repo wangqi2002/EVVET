@@ -1,40 +1,57 @@
 <script lang="ts" setup>
-import { Position } from '@element-plus/icons-vue'
-import { ref } from 'vue'
-import { useXfAsr } from '~/utils/useXfAsr.js'
+import { Position } from "@element-plus/icons-vue";
+import { ref } from "vue";
+import { useXfAsr } from "~/utils/useXfAsr.js";
+import emitter from "../../utils/bus";
 
 // 发送消息消息事件
 const emit = defineEmits<{
-  send: [message: string]
-}>()
+  send: [message: string];
+}>();
 
-const { startRecording, stopRecording, recordText, resultText } = useXfAsr()
+const { startRecording, stopRecording, recordText, resultText } = useXfAsr();
 
 // 输入框内的消息
-const message = ref('')
-const isListening = ref(false)
-const timeOutEvent = ref<ReturnType<typeof setTimeout> | null>(null)
+const message = ref("");
+const isListening = ref(false);
+const timeOutEvent = ref<ReturnType<typeof setTimeout> | null>(null);
 function sendMessage() {
-  emit('send', message.value)
+  emit("send", message.value);
   // 发送完清除
-  message.value = ''
-  message.value = '哈哈哈哈哈哈哈哈哈'
+  message.value = "";
+  message.value = "哈哈哈哈哈哈哈哈哈";
+  emitter.emit("debugMS", {
+    id: "msg-11",
+    role: "assistant",
+    session: undefined as any,
+    validStatus: "VALID",
+    updatedAt: "2025-09-06T12:00:03Z",
+    createdAt: "2025-09-06T12:00:03Z",
+    data: {
+      text: message.value,
+    },
+    dl: [
+      { type: "text", content: "这是一个测试消息" },
+      { type: "image", content: "https://example.com/image.png" },
+      { type: "text", content: "这是另一个测试消息" },
+    ],
+  });
 }
 function goTouchstart() {
   timeOutEvent.value = setTimeout(() => {
-    isListening.value = true
-    console.log('开始录音')
-    startRecording()
-  }, 200) // 长按200毫秒后，触发长按事件
+    isListening.value = true;
+    console.log("开始录音");
+    startRecording();
+  }, 200); // 长按200毫秒后，触发长按事件
 }
 // 手如果在200毫秒内就释放，则取消长按事件
 function goTouchend() {
   if (timeOutEvent.value) {
-    clearTimeout(timeOutEvent.value)
-    timeOutEvent.value = null
-    stopRecording()
-    console.log('结束录音')
-    message.value = resultText
+    clearTimeout(timeOutEvent.value);
+    timeOutEvent.value = null;
+    stopRecording();
+    console.log("结束录音");
+    message.value = resultText;
   }
 }
 </script>

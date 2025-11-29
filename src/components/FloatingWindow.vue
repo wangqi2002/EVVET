@@ -16,14 +16,20 @@
         <button class="fw-close" @click="close">×</button>
       </div>
     </div>
+
     <div class="fw-body" :style="{ maxHeight: maxHeight + 'px' }">
-      <slot />
+      <div v-if="isObject(dataSrc)">
+        <JsonTree :data="dataSrc" />
+      </div>
+      <div v-else class="json-leaf">
+        {{ String(dataSrc) }}
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeUnmount, computed } from "vue";
+import { ref, onBeforeUnmount, computed, defineComponent, h } from "vue";
 
 const props = defineProps<{
   width?: number;
@@ -31,6 +37,7 @@ const props = defineProps<{
   initialX?: number;
   initialY?: number;
   z?: number;
+  data?: Record<string, any> | any[] | null;
 }>();
 
 const visible = ref(true);
@@ -54,7 +61,7 @@ function onPointerDown(e: PointerEvent) {
   startTop = pos.value.y;
   try {
     el.setPointerCapture?.((e as PointerEvent).pointerId);
-  } catch (e) {}
+  } catch {}
   window.addEventListener("pointermove", onPointerMove);
   window.addEventListener("pointerup", onPointerUp);
 }
@@ -80,6 +87,66 @@ function close() {
 onBeforeUnmount(() => {
   window.removeEventListener("pointermove", onPointerMove);
   window.removeEventListener("pointerup", onPointerUp);
+});
+
+const dataSrc = computed(() => props.data ?? {});
+
+function isObject(v: any) {
+  return v !== null && typeof v === "object";
+}
+
+// 递归树组件：使用 <details>/<summary> 提供折叠交互
+const JsonTree = defineComponent({
+  name: "JsonTree",
+  props: {
+    data: { type: [Object, Array], required: true },
+    depth: { type: Number, default: 0 },
+  },
+  setup(props) {
+    const renderNode = (key: string | number | null, val: any, depth = 0) => {
+      const nodeKey = key === null ? "" : String(key);
+      if (val === null || typeof val !== "object") {
+        return h(
+          "div",
+          { class: "json-leaf", style: { paddingLeft: `${depth * 12}px` } },
+          [
+            nodeKey ? h("span", { class: "kv-key" }, nodeKey + ": ") : null,
+            h("span", { class: "kv-val" }, String(val)),
+          ]
+        );
+      } else {
+        const summaryText = nodeKey
+          ? `${nodeKey}: ${Array.isArray(val) ? "[Array]" : "{Object}"}`
+          : Array.isArray(val)
+            ? "[Array]"
+            : "{Object}";
+        return h("details", { class: "json-node" }, [
+          h(
+            "summary",
+            { style: { paddingLeft: `${depth * 12}px` } },
+            summaryText
+          ),
+          h(
+            "div",
+            { class: "json-children" },
+            Object.entries(val).map(([k, v]) => renderNode(k, v, depth + 1))
+          ),
+        ]);
+      }
+    };
+
+    return () => {
+      const root = props.data;
+      if (root === null || typeof root !== "object") {
+        return h("div", { class: "json-leaf" }, String(root));
+      }
+      return h(
+        "div",
+        { class: "json-tree" },
+        Object.entries(root).map(([k, v]) => renderNode(k, v, props.depth))
+      );
+    };
+  },
 });
 </script>
 
@@ -123,5 +190,38 @@ onBeforeUnmount(() => {
   min-height: 60px;
   overflow-y: auto;
   box-sizing: border-box;
+  /* 改动：内容左对齐 */
+  text-align: left;
+}
+
+/* 树形样式 */
+.json-tree {
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
+  font-size: 13px;
+  color: #222;
+  /* 确保树内文本左对齐 */
+  text-align: left;
+}
+.json-node summary {
+  cursor: pointer;
+  list-style: none;
+  outline: none;
+  padding: 4px 0;
+  font-weight: 600;
+  /* 改动：将 summary 块级化以避免居中或内联对齐问题 */
+  display: block;
+}
+.json-leaf {
+  padding: 2px 0;
+  /* 确保叶子节点左对齐 */
+  text-align: left;
+}
+.kv-key {
+  color: #444;
+  margin-right: 6px;
+}
+.kv-val {
+  color: #1a1a1a;
 }
 </style>

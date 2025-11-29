@@ -5,6 +5,7 @@ import { CirclePlus, Close, EditPen } from "@element-plus/icons-vue";
 // import { Client } from '@stomp/stompjs'
 import dayjs from "dayjs";
 import { onMounted, ref } from "vue";
+import emitter from "../../utils/bus";
 // import { useUserStore } from '@/stores/user'
 // import { storeToRefs } from 'pinia'
 import { getstring } from "~/api/demo";
@@ -25,10 +26,16 @@ const activeSession = ref<
   statistic: { tokenCount: 0, wordCount: 0, chatCount: 0 },
   messages: [],
 });
+
 const sessionList = ref([] as ChatSession[]);
+
 onMounted(() => {
   console.log("home-in");
   sessionList.value.push(...chatSessionsData);
+  emitter.on("debugMS", (data) => {
+    console.log("debugMS", data);
+    debugMS.value.push(data);
+  });
   /* // 查询自己的聊天会话
   queryChatSession({ pageSize: 1000, pageNum: 1, query: {} }).then((res) => {
     // 讲会话添加到列表中
@@ -115,6 +122,7 @@ const userInfo = ref({
   username: "kokoko",
   password: "abcABC123",
 });
+const debugMS = ref([]);
 </script>
 
 <template>
@@ -198,16 +206,20 @@ const userInfo = ref({
       </div>
     </div>
   </div>
-  <FloatingWindow :width="360" :maxHeight="300" :initialX="200" :initialY="120">
+  <FloatingWindow
+    :width="360"
+    :maxHeight="300"
+    :initialX="200"
+    :initialY="120"
+    :data="debugMS"
+  >
     <template #title>工具窗口</template>
-    <div>
-      <p>这是一个可拖拽的浮动窗口。你可以把它移动到任意位置。</p>
-      <p>下面演示较多内容，使内容区域产生竖向滚动。</p>
+    <!-- <div>
+      <p>调试窗口</p>
       <ul>
-        <li v-for="i in 20" :key="i">示例行 - 内容项 {{ i }}</li>
+        <li v-for="item in debugMS">{{ item }}</li>
       </ul>
-      <p>你可以在这里放任意信息：日志、帮助文本、快捷操作或列表等。</p>
-    </div>
+    </div> -->
   </FloatingWindow>
 </template>
 
