@@ -10,74 +10,74 @@ import electron from 'vite-plugin-electron'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: './', // 根据需要调整，确保路径正确
-  build: {
-    outDir: 'dist_web', // 将构建输出到 dist_web 文件夹，以避免与 Electron 的 dist 混淆
-    emptyOutDir: true, // 清空输出目录
-  },
-  server: {
-    // port: 3000,
-    open: false, // 不自动打开浏览器
-    host: true, // 允许局域网访问
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-        rewrite: path => path.replace(/^\/api/, ''),
-      },
+    base: './', // 根据需要调整，确保路径正确
+    build: {
+        outDir: 'dist_web', // 将构建输出到 dist_web 文件夹，以避免与 Electron 的 dist 混淆
+        emptyOutDir: true, // 清空输出目录
     },
-  },
-  define: {
-    'process.env': {
-    }, // 根据需要定义环境变量
-  },
-  resolve: {
-    alias: {
-      '~/': `${path.resolve(__dirname, 'src')}/`,
+    server: {
+        // port: 3000,
+        open: false, // 不自动打开浏览器
+        host: true, // 允许局域网访问
+        proxy: {
+            '/api': {
+                target: 'http://localhost:5000',
+                changeOrigin: true,
+                rewrite: path => path.replace(/^\/api/, ''),
+            },
+        },
     },
-  },
-
-  css: {
-    preprocessorOptions: {
-      scss: {
-        additionalData: `@use "~/styles/element/index.scss" as *;`,
-        api: 'modern-compiler',
-      },
+    define: {
+        'process.env': {
+        }, // 根据需要定义环境变量
     },
-  },
+    resolve: {
+        alias: {
+            '~/': `${path.resolve(__dirname, 'src')}/`,
+        },
+    },
 
-  plugins: [
-    Vue(),
-    electron({
-      entry: 'electron.main.js',
-    }),
+    css: {
+        preprocessorOptions: {
+            scss: {
+                additionalData: `@use "~/styles/element/index.scss" as *;`,
+                api: 'modern-compiler',
+            },
+        },
+    },
 
-    // https://github.com/posva/unplugin-vue-router
-    VueRouter({
-      extensions: ['.vue', '.md'],
-      dts: 'src/typed-router.d.ts',
-    }),
-
-    Components({
-      // allow auto load markdown components under `./src/components/`
-      extensions: ['vue', 'md'],
-      // allow auto import and register components used in markdown
-      include: [/\.vue$/, /\.vue\?vue/, /\.md$/],
-      resolvers: [
-        ElementPlusResolver({
-          importStyle: 'sass',
+    plugins: [
+        Vue(),
+        electron({
+            entry: 'electron.main.js',
         }),
-      ],
-      dts: 'src/components.d.ts',
-    }),
 
-    // https://github.com/antfu/unocss
-    // see uno.config.ts for config
-    Unocss(),
-  ],
+        // https://github.com/posva/unplugin-vue-router
+        VueRouter({
+            extensions: ['.vue', '.md'],
+            dts: 'src/typed-router.d.ts',
+        }),
 
-  ssr: {
-    // TODO: workaround until they support native ESM
-    noExternal: ['element-plus'],
-  },
+        Components({
+            // allow auto load markdown components under `./src/components/`
+            extensions: ['vue', 'md'],
+            // allow auto import and register components used in markdown
+            include: [/\.vue$/, /\.vue\?vue/, /\.md$/],
+            resolvers: [
+                ElementPlusResolver({
+                    importStyle: 'sass',
+                }),
+            ],
+            dts: 'src/components.d.ts',
+        }),
+
+        // https://github.com/antfu/unocss
+        // see uno.config.ts for config
+        Unocss(),
+    ],
+
+    ssr: {
+        // TODO: workaround until they support native ESM
+        noExternal: ['element-plus'],
+    },
 })

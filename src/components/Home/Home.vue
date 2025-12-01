@@ -8,7 +8,6 @@ import { onMounted, ref } from "vue";
 import emitter from "../../utils/bus";
 // import { useUserStore } from '@/stores/user'
 // import { storeToRefs } from 'pinia'
-import { getstring } from "~/api/demo";
 import { chatSessionsData } from "../../utils/virtualData";
 import MessageInput from "../chat/MessageInput.vue";
 
@@ -35,7 +34,6 @@ onMounted(() => {
     sessionList.value.push(...chatSessionsData);
     let cnt = 0;
     emitter.on("debugMS", (data) => {
-        console.log("debugMS", data);
         if (cnt < 10) {
             debugMS.value.push(data);
         } else {
@@ -44,6 +42,7 @@ onMounted(() => {
         }
         cnt = cnt + 1;
     });
+
     /* // 查询自己的聊天会话
     queryChatSession({ pageSize: 1000, pageNum: 1, query: {} }).then((res) => {
       // 讲会话添加到列表中
@@ -97,8 +96,6 @@ client.activate(); */
 const responseMessage = ref({} as ChatMessage);
 function handleSendMessage(message: string) {
     console.log("handleSendMessage");
-    // const data = getstring()
-    // console.log(data)
 
     /* // 新建一个ChatGPT回复对象，不能重复使用同一个对象。
     responseMessage.value = {

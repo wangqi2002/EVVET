@@ -1,10 +1,10 @@
 import type { LoginResponse, Page, QueryRequest, User } from '../typings/types'
 import requestWithToken from '../utils/request'
 
-export function getstring() {
-  return requestWithToken<string>('/demo/get', 'GET')
+export function getRobot() {
+    return requestWithToken<string>('/robot', 'GET')
 }
 
-export function poststring(id: string) {
-  return requestWithToken<string>(`/demo/post`, 'POST', id)
+export function getVision() {
+    return requestWithToken<string>('/vision', 'GET')
 }
