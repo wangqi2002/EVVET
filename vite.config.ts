@@ -16,12 +16,12 @@ export default defineConfig({
         emptyOutDir: true, // 清空输出目录
     },
     server: {
-        // port: 3000,
         open: false, // 不自动打开浏览器
         host: true, // 允许局域网访问
+        cors: true,
         proxy: {
             '/api': {
-                target: 'http://localhost:5000',
+                target: 'http://127.0.0.1:5000/',
                 changeOrigin: true,
                 rewrite: path => path.replace(/^\/api/, ''),
             },

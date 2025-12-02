@@ -52,7 +52,6 @@ app.whenReady().then(() => {
 app.on('ready', () => {
     globalShortcut.register('Alt+k', () => {
         win.webContents.openDevTools()
-        console.log('Alt+k is pressed')
         console.log(win.webContents.openDevTools)
         win.webContents.on('devtools-opened', () => {
             console.log('DevTools 已打开事件触发')

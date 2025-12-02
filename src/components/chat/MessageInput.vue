@@ -16,7 +16,7 @@ const { startRecording, stopRecording, recordText, resultText } = useXfAsr();
 const message = ref("");
 const isListening = ref(false);
 const timeOutEvent = ref<ReturnType<typeof setTimeout> | null>(null);
-function sendMessage() {
+async function sendMessage() {
     emit("send", message.value);
     // 发送完清除
     message.value = "";
@@ -38,10 +38,7 @@ function sendMessage() {
     //     ],
     //   });
 
-    const data = getRobot()
-    emitter.emit("debugMS", {value:data,
-        id: "msg-11",
-      });
+    const data = await getRobot()
     console.log(data)
 }
 function goTouchstart() {
