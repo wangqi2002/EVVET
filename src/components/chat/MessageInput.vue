@@ -3,7 +3,7 @@ import { Position } from "@element-plus/icons-vue";
 import { ref } from "vue";
 import { useXfAsr } from "~/utils/useXfAsr.js";
 import emitter from "~/utils/bus";
-import { getRobot } from "~/api/demo";
+import { getRobot } from "~/api/robot";
 
 // 发送消息消息事件
 const emit = defineEmits<{
@@ -18,26 +18,7 @@ const isListening = ref(false);
 const timeOutEvent = ref<ReturnType<typeof setTimeout> | null>(null);
 async function sendMessage() {
     emit("send", message.value);
-    // 发送完清除
     message.value = "";
-    message.value = "哈哈哈哈哈哈哈哈哈";
-    //   emitter.emit("debugMS", {
-    //     id: "msg-11",
-    //     role: "assistant",
-    //     session: undefined as any,
-    //     validStatus: "VALID",
-    //     updatedAt: "2025-09-06T12:00:03Z",
-    //     createdAt: "2025-09-06T12:00:03Z",
-    //     data: {
-    //       text: message.value,
-    //     },
-    //     dl: [
-    //       { type: "text", content: "这是一个测试消息" },
-    //       { type: "image", content: "https://example.com/image.png" },
-    //       { type: "text", content: "这是另一个测试消息" },
-    //     ],
-    //   });
-
     const data = await getRobot()
     console.log(data)
 }

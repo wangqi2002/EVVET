@@ -1,21 +1,23 @@
 <!-- eslint-disable no-console -->
 <script lang="ts" setup>
-import type { ChatMessage, ChatSession } from "../../typings/types";
-import { CirclePlus, Close, EditPen } from "@element-plus/icons-vue";
-// import { Client } from '@stomp/stompjs'
-import dayjs from "dayjs"; 
+import dayjs from "dayjs";
 import { onMounted, ref } from "vue";
-import emitter from "../../utils/bus";
-// import { useUserStore } from '@/stores/user'
-// import { storeToRefs } from 'pinia'
-import { chatSessionsData } from "../../utils/virtualData";
-import MessageInput from "../chat/MessageInput.vue";
+import { CirclePlus, Close, EditPen } from "@element-plus/icons-vue";
+import { el } from "element-plus/es/locales.mjs";
 
+import type { ChatMessage, ChatSession } from "../../typings/types";
+import { chatSessionsData } from "../../utils/virtualData";
+import emitter from "../../utils/bus";
+
+import MessageInput from "../chat/MessageInput.vue";
 import MessageRow from "../chat/MessageRow.vue";
 import FloatingWindow from "../FloatingWindow.vue";
-// import { findChatSessionById, queryChatSession, saveChatSession } from '@/api/chat-session'
 import SessionItem from "../chat/SessionItem.vue";
-import { el } from "element-plus/es/locales.mjs";
+
+// import { findChatSessionById, queryChatSession, saveChatSession } from '@/api/chat-session'
+// import { Client } from '@stomp/stompjs'
+// import { useUserStore } from '@/stores/user'
+// import { storeToRefs } from 'pinia'
 
 const isEdit = ref(false);
 const activeSession = ref<
@@ -26,8 +28,16 @@ const activeSession = ref<
     statistic: { tokenCount: 0, wordCount: 0, chatCount: 0 },
     messages: [],
 });
-
 const sessionList = ref([] as ChatSession[]);
+const responseMessage = ref({} as ChatMessage);
+const userInfo = ref({
+    avatar: "src/assets/avatar.png",
+    nickname: "koko",
+    username: "kokoko",
+    password: "abcABC123",
+});
+const debugMS = ref([]);
+// const { userInfo } = storeToRefs(useUserStore());
 
 onMounted(() => {
     console.log("home-in");
@@ -35,10 +45,10 @@ onMounted(() => {
     let cnt = 0;
     emitter.on("debugMS", (data) => {
         if (cnt < 10) {
-            debugMS.value.push(data);
+            debugMS.value.push(data as never);
         } else {
             debugMS.value.shift();
-            debugMS.value.push(data);
+            debugMS.value.push(data as never);
         }
         cnt = cnt + 1;
     });
@@ -93,7 +103,6 @@ function handleUpdateSession() {
 // 发起连接
 client.activate(); */
 // ChatGPT的回复
-const responseMessage = ref({} as ChatMessage);
 function handleSendMessage(message: string) {
     console.log("handleSendMessage");
 
@@ -120,14 +129,6 @@ function handleSendMessage(message: string) {
     // 将两条消息显示在页面中
     activeSession.value.messages.push(...[chatMessage, responseMessage.value]); */
 }
-// const { userInfo } = storeToRefs(useUserStore());
-const userInfo = ref({
-    avatar: "src/assets/avatar.png",
-    nickname: "koko",
-    username: "kokoko",
-    password: "abcABC123",
-});
-const debugMS = ref([]);
 </script>
 
 <template>
@@ -200,12 +201,6 @@ const debugMS = ref([]);
     </div>
     <FloatingWindow :width="360" :maxHeight="300" :initialX="200" :initialY="120" :data="debugMS">
         <template #title>工具窗口</template>
-        <!-- <div>
-      <p>调试窗口</p>
-      <ul>
-        <li v-for="item in debugMS">{{ item }}</li>
-      </ul>
-    </div> -->
     </FloatingWindow>
 </template>
 
