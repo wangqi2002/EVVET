@@ -2,6 +2,8 @@ import type { Method } from 'axios'
 import type { Result } from '../typings/types'
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
+import emitter from "~/utils/bus";
+
 
 const baseUrl = '/api'
 const http = axios.create({
@@ -28,6 +30,9 @@ http.interceptors.response.use(
   },
 )
 async function requestWithToken<T>(url: string, method: Method, data?: any): Promise<Result<T>> {
+  emitter.emit("debugMS", {value:data,
+      url: url,
+    });
   if (method === 'get' || method === 'GET') {
     return await http({ url, method, params: data })
   }

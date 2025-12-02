@@ -2,7 +2,7 @@
 import { Position } from "@element-plus/icons-vue";
 import { ref } from "vue";
 import { useXfAsr } from "~/utils/useXfAsr.js";
-import emitter from "../../utils/bus";
+import emitter from "~/utils/bus";
 import { getRobot } from "~/api/demo";
 
 // 发送消息消息事件
@@ -39,7 +39,9 @@ function sendMessage() {
     //   });
 
     const data = getRobot()
-    emitter.emit("debugMS", data);
+    emitter.emit("debugMS", {value:data,
+        id: "msg-11",
+      });
     console.log(data)
 }
 function goTouchstart() {
