@@ -25,18 +25,19 @@ async function sendMessage() {
 function goTouchstart() {
     timeOutEvent.value = setTimeout(() => {
         isListening.value = true;
-        console.log("开始录音");
         startRecording();
     }, 200); // 长按200毫秒后，触发长按事件
 }
 // 手如果在200毫秒内就释放，则取消长按事件
-function goTouchend() {
+async function goTouchend() {
     if (timeOutEvent.value) {
         clearTimeout(timeOutEvent.value);
         timeOutEvent.value = null;
-        stopRecording();
-        console.log("结束录音");
-        message.value = resultText;
+        await stopRecording();
+        setTimeout(() => {
+            message.value = resultText.value;
+            // emitter.emit("debugMS", resultText.value);
+        }, 200);
     }
 }
 </script>
