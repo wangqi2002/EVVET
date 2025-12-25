@@ -4,10 +4,15 @@ import { ref } from "vue";
 import { useXfAsr } from "~/utils/useXfAsr.js";
 import emitter from "~/utils/bus";
 import { getRobot } from "~/api/robot";
+import dayjs from "dayjs";
 
 // 发送消息消息事件
 const emit = defineEmits<{
     send: [message: string];
+}>();
+
+const props = defineProps<{
+    isInSession: () => boolean;
 }>();
 
 const { startRecording, stopRecording, recordText, resultText } = useXfAsr();
@@ -17,10 +22,16 @@ const message = ref("");
 const isListening = ref(false);
 const timeOutEvent = ref<ReturnType<typeof setTimeout> | null>(null);
 async function sendMessage() {
+    if (!props.isInSession()) {
+        emitter.emit("createNewSession");
+    }
     emit("send", message.value);
+    const userMessage = message.value;
+    const requestValue = { question: message.value }
     message.value = "";
-    const data = await getRobot()
-    console.log(data)
+    const data = await getRobot(requestValue); // 获取答复内容
+    // const data = "这是机器人回复的示例内容。"; // 示例回复内容
+    emitter.emit("addReplyMessage", { userMessage, replyMessage: data }); // 发送事件
 }
 function goTouchstart() {
     timeOutEvent.value = setTimeout(() => {

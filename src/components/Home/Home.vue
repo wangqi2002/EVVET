@@ -39,9 +39,7 @@ const userInfo = ref({
 const debugMS = ref([]);
 // const { userInfo } = storeToRefs(useUserStore());
 
-onMounted(() => {
-    console.log("home-in");
-    sessionList.value.push(...chatSessionsData);
+function emitterListen() {
     let cnt = 0;
     emitter.on("debugMS", (data) => {
         if (cnt < 10) {
@@ -52,6 +50,67 @@ onMounted(() => {
         }
         cnt = cnt + 1;
     });
+
+    // 监听新增回复消息事件
+    emitter.on("addReplyMessage", (data: any) => {
+
+        const userMsg = {
+            id: `msg-${Date.now()}`,
+            content: data.userMessage,
+            role: "user",
+            createdAt: dayjs().toISOString(),
+            updatedAt: dayjs().toISOString(),
+            validStatus: "VALID",
+        };
+        const replyMsg = {
+            id: `msg-${Date.now() + 1}`,
+            content: data.replyMessage,
+            role: "assistant",
+            createdAt: dayjs().toISOString(),
+            updatedAt: dayjs().toISOString(),
+            validStatus: "VALID",
+        };
+        activeSession.value.messages.push(userMsg as never, replyMsg as never);
+        let session = sessionList.value.find((s) => s.id === activeSession.value.id);
+        if (session) {
+            session = activeSession.value as never;
+        }
+    });
+
+    // 监听新建会话事件
+    emitter.on("createNewSession", () => {
+        const newSession = {
+            id: `session-${Date.now()}`,
+            topic: `新的聊天 ${sessionList.value.length + 1}`,
+            statistic: {
+                chatCount: 0,
+                tokenCount: 0,
+                wordCount: 0,
+            },
+            messages: [],
+            createdBy: {
+                id: "user-0",
+                avatar: "/avatars/default.png",
+                nickname: "默认用户",
+                username: "default_user",
+                password: "default_password",
+                updatedAt: dayjs().toISOString(),
+                createdAt: dayjs().toISOString(),
+                validStatus: "VALID",
+            },
+            validStatus: "VALID",
+            updatedAt: dayjs().toISOString(),
+            createdAt: dayjs().toISOString(),
+        };
+        sessionList.value.unshift(newSession as never);
+        activeSession.value = newSession;
+    });
+}
+
+onMounted(() => {
+    console.log("home-in");
+    sessionList.value.push(...chatSessionsData);
+    emitterListen();
 
     /* // 查询自己的聊天会话
     queryChatSession({ pageSize: 1000, pageNum: 1, query: {} }).then((res) => {
@@ -75,59 +134,47 @@ function handleDeleteSession(session: ChatSession) {
     sessionList.value.splice(index, 1);
 }
 // 新增会话
-async function handleCreateSession() {
-    console.log("handleCreateSession");
-    //   const res = await saveChatSession({ topic: "新的聊天" });
-    //   sessionList.value.unshift((await findChatSessionById(res.result)).result);
+function handleCreateSession() {
+    const newSession = {
+        id: `session-${Date.now()}`,
+        topic: `新的聊天 ${sessionList.value.length + 1}`,
+        statistic: {
+            chatCount: 0,
+            tokenCount: 0,
+            wordCount: 0,
+        },
+        messages: [],
+        createdBy: {
+            id: "user-0",
+            avatar: "/avatars/default.png",
+            nickname: "默认用户",
+            username: "default_user",
+            password: "default_password",
+            updatedAt: dayjs().toISOString(),
+            createdAt: dayjs().toISOString(),
+            validStatus: "VALID",
+        },
+        validStatus: "VALID",
+        updatedAt: dayjs().toISOString(),
+        createdAt: dayjs().toISOString(),
+    };
+    sessionList.value.unshift(newSession as never);
 }
 function handleUpdateSession() {
-    console.log("handleUpdateSession");
-    //   saveChatSession(activeSession.value);
-    //   isEdit.value = false;
+    const session = sessionList.value.find((s) => s.id === activeSession.value.id);
+    if (session) {
+        session.topic = activeSession.value.topic;
+    }
+    isEdit.value = false;
 }
 
-/* const client = new Client({
-  brokerURL: "ws://localhost:8080/handshake",
-  connectHeaders: {
-    token: localStorage.getItem("token") || "",
-  },
-  onConnect: () => {
-    // 连接成功后订阅ChatGPT回复地址
-    client.subscribe("/user/queue/chatMessage/receive", (message) => {
-      // 将每次回复的结果追加到回复结果中
-      responseMessage.value.content += message.body;
-      console.log(message.body);
-    });
-  },
-});
-// 发起连接
-client.activate(); */
 // ChatGPT的回复
 function handleSendMessage(message: string) {
     console.log("handleSendMessage");
+}
 
-    /* // 新建一个ChatGPT回复对象，不能重复使用同一个对象。
-    responseMessage.value = {
-      role: "assistant",
-      content: "",
-      // 因为回复的消息没有id，所以统一将创建时间+index当作key
-      createdAt: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-    } as ChatMessage;
-    // 用户的提问
-    const chatMessage = {
-      session: Object.assign({}, activeSession.value),
-      content: message,
-      role: "user",
-      createdAt: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-    } as ChatMessage;
-    // 防止循环依赖，会导致json序列化失败
-    chatMessage.session.messages = [];
-    client.publish({
-      destination: "/socket/chatMessage/send",
-      body: JSON.stringify(chatMessage),
-    });
-    // 将两条消息显示在页面中
-    activeSession.value.messages.push(...[chatMessage, responseMessage.value]); */
+function isInSession() {
+    return activeSession.value.id !== "";
 }
 </script>
 
@@ -195,7 +242,7 @@ function handleSendMessage(message: string) {
                     </transition-group>
                 </div>
                 <!-- 监听发送事件 -->
-                <MessageInput class="input-card" @send="handleSendMessage" />
+                <MessageInput class="input-card" @send="handleSendMessage" :isInSession="isInSession" />
             </div>
         </div>
     </div>
