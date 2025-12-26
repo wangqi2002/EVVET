@@ -24,6 +24,7 @@
     "axios": "^1.12.2",
     "crypto-js": "^4.2.0",
     "element-plus": "^2.9.5",
+    "js-audio-recorder": "^1.0.7",
     "md-editor-v3": "^5.8.4",
     "mitt": "^3.0.1",
     "vite-plugin-electron": "^0.29.0",
