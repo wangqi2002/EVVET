@@ -49,17 +49,18 @@ function goTouchstart() {
 // 手如果在200毫秒内就释放，则取消长按事件
 async function goTouchend() {
     if (isListening.value) {
-        console.log("取消录音");
         timeOutEvent.value = null;
         record.stop();
         isListening.value = false;
         const wavBlob = record.getWAVBlob();
-        const requestValue = { audio: wavBlob }
-        // console.log(requestValue);
-        emitter.emit("debugMS", requestValue);
+        // 此处获取到blob对象后需要设置fileName满足当前项目上传需求，其它项目可直接传把blob作为file塞入formData
+        const newbolb = new Blob([wavBlob], { type: 'audio/wav' })
+        //获取当时时间戳作为文件名
+        const fileOfBlob = new File([newbolb], new Date().getTime() + '.wav')
+        const requestValue = {audio:fileOfBlob}
         const data = await getText(requestValue)
         // console.log(data);
-        emitter.emit("debugMS", data);
+        // emitter.emit("debugMS", data);
         setTimeout(() => {
             message.value = data.result;
             // emitter.emit("debugMS", resultText.value);
@@ -74,7 +75,7 @@ function startRecordAudio() {
             record.start(); // 开始录音
         },
         (error: any) => {
-            // alert("无法获取麦克风权限");
+            alert("无法获取麦克风权限");
             isListening.value = false;
             console.log(`${error.name} : ${error.message}`);
         }

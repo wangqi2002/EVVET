@@ -11,6 +11,7 @@ const http = axios.create({
     timeout: 5000,
 })
 http.interceptors.request.use((request) => {
+    // emitter.emit("debugMS", request);
     // const token = window.localStorage.getItem('token')
     // request.headers.set('token', token ?? '')
     return request
