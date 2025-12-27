@@ -13,3 +13,6 @@ export function getText(data?: any) {
     return requestWithToken<string>('/robot/text', 'GET', data)
 }
 
+export function postText(data?: any) {
+    return requestWithToken<string>('/robot/text1', 'POST', data)
+}

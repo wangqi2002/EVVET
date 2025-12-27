@@ -2,7 +2,7 @@
 import { Position, Microphone } from "@element-plus/icons-vue";
 import { ref } from "vue";
 import emitter from "~/utils/bus";
-import { getReply, getText } from "~/api/robot";
+import { getReply, getText, postText } from "~/api/robot";
 import dayjs from "dayjs";
 import Recorder from 'js-audio-recorder';
 
@@ -57,12 +57,17 @@ async function goTouchend() {
         const newbolb = new Blob([wavBlob], { type: 'audio/wav' })
         //获取当时时间戳作为文件名
         const fileOfBlob = new File([newbolb], new Date().getTime() + '.wav')
-        const requestValue = {audio:fileOfBlob}
-        const data = await getText(requestValue)
+        // const requestValue = { audio: fileOfBlob }
+        // const data = await getText(requestValue)
+
+        const formData = new FormData();
+        formData.append("audio", fileOfBlob); // "file" 对应后端的字段名
+        const data = await postText(formData);
+
         // console.log(data);
         // emitter.emit("debugMS", data);
         setTimeout(() => {
-            message.value = data.result;
+            message.value = data as never;
             // emitter.emit("debugMS", resultText.value);
         }, 200);
     }
