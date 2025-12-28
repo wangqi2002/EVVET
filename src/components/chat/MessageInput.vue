@@ -24,7 +24,6 @@ const record = new Recorder({
     sampleBits: 16, // 采样位数，支持 8 或 16，默认是16
     sampleRate: 16000, // 采样率，支持 11025、16000、22050、24000、44100、48000，根据浏览器默认值，我的chrome是48000
     numChannels: 1, // 声道，支持 1 或 2， 默认是1
-    // compiling: false,(0.x版本中生效,1.x增加中)  // 是否边录边转换，默认是false
 })
 
 async function sendMessage() {
@@ -34,11 +33,12 @@ async function sendMessage() {
     emit("send", message.value);
     const userMessage = message.value;
     const requestValue = { question: message.value }
+    emitter.emit("addSendMessage", { userMessage }); // 发送事件
     message.value = "";
     const data = await getReply(requestValue); // 获取答复内容
     // emitter.emit("debugMS", data);
     // const data = "这是机器人回复的示例内容。"; // 示例回复内容
-    emitter.emit("addReplyMessage", { userMessage, replyMessage: data }); // 发送事件
+    emitter.emit("addReplyMessage", { replyMessage: data }); // 发送事件
 }
 function goTouchstart() {
     timeOutEvent.value = setTimeout(() => {
@@ -53,7 +53,6 @@ async function goTouchend() {
         record.stop();
         isListening.value = false;
         const wavBlob = record.getWAVBlob();
-        // 此处获取到blob对象后需要设置fileName满足当前项目上传需求，其它项目可直接传把blob作为file塞入formData
         const newbolb = new Blob([wavBlob], { type: 'audio/wav' })
         //获取当时时间戳作为文件名
         const fileOfBlob = new File([newbolb], new Date().getTime() + '.wav')

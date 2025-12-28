@@ -51,8 +51,8 @@ function emitterListen() {
         cnt = cnt + 1;
     });
 
-    // 监听新增回复消息事件
-    emitter.on("addReplyMessage", (data: any) => {
+    // 监听新增发送消息事件
+    emitter.on("addSendMessage", (data: any) => {
 
         const userMsg = {
             id: `msg-${Date.now()}`,
@@ -62,6 +62,16 @@ function emitterListen() {
             updatedAt: dayjs().toISOString(),
             validStatus: "VALID",
         };
+        activeSession.value.messages.push(userMsg as never);
+        let session = sessionList.value.find((s) => s.id === activeSession.value.id);
+        if (session) {
+            session = activeSession.value as never;
+        }
+    });
+
+    // 监听新增回复消息事件
+    emitter.on("addReplyMessage", (data: any) => {
+
         const replyMsg = {
             id: `msg-${Date.now() + 1}`,
             content: data.replyMessage,
@@ -70,7 +80,7 @@ function emitterListen() {
             updatedAt: dayjs().toISOString(),
             validStatus: "VALID",
         };
-        activeSession.value.messages.push(userMsg as never, replyMsg as never);
+        activeSession.value.messages.push(replyMsg as never);
         let session = sessionList.value.find((s) => s.id === activeSession.value.id);
         if (session) {
             session = activeSession.value as never;
