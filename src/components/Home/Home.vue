@@ -119,7 +119,7 @@ function emitterListen() {
 
 onMounted(() => {
     console.log("home-in");
-    sessionList.value.push(...chatSessionsData);
+    // sessionList.value.push(...chatSessionsData);
     emitterListen();
 
     /* // 查询自己的聊天会话
