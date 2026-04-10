@@ -18,21 +18,22 @@ http.interceptors.request.use((request) => {
 })
 http.interceptors.response.use(
     (res) => {
-        emitter.emit("debugMS", res);
+        emitter.emit("debugMS", { "response": res });
         return res.data
     },
-    ({ response }) => {
-        if (response.data.code !== 1) {
-            ElMessage.warning({ message: response.data.msg })
+    ({ error }) => {
+        emitter.emit("debugMS", { "error": error });
+        if (error.data.code !== 1) {
+            ElMessage.warning({ message: error.data.msg })
         }
         else {
             /* empty */
         }
-        return response.data
+        return Promise.reject(error);
     },
 )
 async function requestWithToken<T>(url: string, method: Method, data?: any): Promise<Result<T>> {
-
+    emitter.emit("debugMS", { "request": { url, method, data } });
     if (method === 'get' || method === 'GET') {
         return await http({ url, method, params: data })
     }

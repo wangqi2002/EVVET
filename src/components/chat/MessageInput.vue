@@ -22,7 +22,7 @@ const isListening = ref(false);
 const timeOutEvent = ref<ReturnType<typeof setTimeout> | null>(null);
 const record = new Recorder({
     sampleBits: 16, // 采样位数，支持 8 或 16，默认是16
-    sampleRate: 16000, // 采样率，支持 11025、16000、22050、24000、44100、48000，根据浏览器默认值，我的chrome是48000
+    sampleRate: 44100, // 采样率，支持 11025、16000、22050、24000、44100、48000，根据浏览器默认值，我的chrome是48000
     numChannels: 1, // 声道，支持 1 或 2， 默认是1
 })
 
@@ -56,8 +56,6 @@ async function goTouchend() {
         const newbolb = new Blob([wavBlob], { type: 'audio/wav' })
         //获取当时时间戳作为文件名
         const fileOfBlob = new File([newbolb], new Date().getTime() + '.wav')
-        // const requestValue = { audio: fileOfBlob }
-        // const data = await getText(requestValue)
 
         const formData = new FormData();
         formData.append("audio", fileOfBlob); // "file" 对应后端的字段名
@@ -66,6 +64,7 @@ async function goTouchend() {
         // console.log(data);
         // emitter.emit("debugMS", data);
         setTimeout(() => {
+            emitter.emit("debugMS", data);
             message.value = data as never;
             // emitter.emit("debugMS", resultText.value);
         }, 200);
