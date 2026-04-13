@@ -21,6 +21,7 @@ const message = ref("");
 const message_bk = ref("");
 
 const isListening = ref(false);
+const isStart = ref(false);
 const timeOutEvent = ref<ReturnType<typeof setTimeout> | null>(null);
 const record = new Recorder({
     sampleBits: 16, // 采样位数，支持 8 或 16，默认是16
@@ -46,11 +47,11 @@ function goTouchstart() {
     timeOutEvent.value = setTimeout(() => {
         isListening.value = true;
         startRecordAudio();
-    }, 200); // 长按200毫秒后，触发长按事件
+    }, 300); // 长按200毫秒后，触发长按事件
 }
 // 手如果在200毫秒内就释放，则取消长按事件
 async function goTouchend() {
-    if (isListening.value) {
+    if (isListening.value || isStart.value) {
         timeOutEvent.value = null;
         record.stop();
         isListening.value = false;
@@ -87,6 +88,15 @@ async function goTouchend() {
     }
 }
 
+function handleListen() {
+    if (!isStart.value) {
+        startRecordAudio();
+    } else {
+        goTouchend();
+    }
+    isStart.value = !isStart.value;
+}
+
 function startRecordAudio() {
     Recorder.getPermission().then(
         () => {
@@ -111,12 +121,18 @@ function startRecordAudio() {
             <el-input v-model="message" :autosize="false" :rows="3" class="input" resize="none" type="textarea"
                 @keydown.enter="sendMessage" />
             <div class="button-wrapper">
-                <el-button type="primary" @mousedown.prevent="goTouchstart()" @mouseup.prevent="goTouchend()"
+                <!-- <el-button type="primary" @mousedown.prevent="goTouchstart()" @mouseup.prevent="goTouchend()"
                     @touchstart.prevent="goTouchstart()" @touchend.prevent="goTouchend()">
                     <el-icon class="el-icon--left">
                         <Microphone />
                     </el-icon>
                     {{ isListening ? '正在录音...' : '按住说话' }}
+                </el-button> -->
+                <el-button type="primary" @click="handleListen()">
+                    <el-icon class="el-icon--left">
+                        <Microphone />
+                    </el-icon>
+                    {{ isStart ? '结束录音' : '开始录音' }}
                 </el-button>
                 <el-button type="primary" @click="sendMessage">
                     <el-icon class="el-icon--left">
