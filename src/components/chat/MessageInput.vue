@@ -5,6 +5,7 @@ import emitter from "~/utils/bus";
 import { getReply, getText, postText } from "~/api/robot";
 import dayjs from "dayjs";
 import Recorder from 'js-audio-recorder';
+import { set } from "@vueuse/core";
 
 // 发送消息消息事件
 const emit = defineEmits<{
@@ -17,6 +18,7 @@ const props = defineProps<{
 
 // 输入框内的消息
 const message = ref("");
+const message_bk = ref("");
 
 const isListening = ref(false);
 const timeOutEvent = ref<ReturnType<typeof setTimeout> | null>(null);
@@ -65,9 +67,23 @@ async function goTouchend() {
         // emitter.emit("debugMS", data);
         setTimeout(() => {
             emitter.emit("debugMS", data);
-            message.value = data as never;
-            // emitter.emit("debugMS", resultText.value);
-        }, 200);
+            // message.value = data as never;
+            message_bk.value = data as never;
+            if (!props.isInSession()) {
+                emitter.emit("createNewSession");
+            }
+            emit("send", data as never);
+        }, 100);
+
+        setTimeout(async () => {
+            const userMessage = message_bk.value;
+            const requestValue = { question: message_bk.value }
+            emitter.emit("addSendMessage", { userMessage }); // 发送事件
+            const data = await getReply(requestValue); // 获取答复内容
+            // emitter.emit("debugMS", data);
+            // const data = "这是机器人回复的示例内容。"; // 示例回复内容
+            emitter.emit("addReplyMessage", { replyMessage: data }); // 发送事件
+        }, 300);
     }
 }
 
