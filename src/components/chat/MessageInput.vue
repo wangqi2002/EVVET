@@ -6,6 +6,8 @@ import { getReply, getText, postText } from "~/api/robot";
 import dayjs from "dayjs";
 import Recorder from 'js-audio-recorder';
 import { set } from "@vueuse/core";
+import { el } from "element-plus/es/locales.mjs";
+import { ElMessage } from 'element-plus'
 
 // 发送消息消息事件
 const emit = defineEmits<{
@@ -67,13 +69,22 @@ async function goTouchend() {
         // console.log(data);
         // emitter.emit("debugMS", data);
         setTimeout(() => {
-            emitter.emit("debugMS", data);
+            emitter.emit("debugMS", { setTimeout: data });
             // message.value = data as never;
             message_bk.value = data as never;
-            if (!props.isInSession()) {
-                emitter.emit("createNewSession");
+            if (message_bk.value === "未接收到语音") {
+                ElMessage.warning({ message: message_bk.value })
+                return;
+            } else if (message_bk.value === "语音识别失败") {
+                ElMessage.warning({ message: message_bk.value })
+                return;
+            } else {
+                if (!props.isInSession()) {
+                    emitter.emit("createNewSession");
+                }
+                emit("send", data as never);
             }
-            emit("send", data as never);
+            return;
         }, 100);
 
         setTimeout(async () => {

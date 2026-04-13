@@ -15,6 +15,10 @@ http.interceptors.request.use((request) => {
     // const token = window.localStorage.getItem('token')
     // request.headers.set('token', token ?? '')
     return request
+}, (error) => {
+    // 对请求错误做些什么
+    ElMessage.warning({ message: error.data.msg })
+    return Promise.reject(error);
 })
 http.interceptors.response.use(
     (res) => {
