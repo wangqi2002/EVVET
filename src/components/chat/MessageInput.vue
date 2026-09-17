@@ -14,14 +14,18 @@
 		send: [message: string];
 	}>();
 
-	const props = defineProps<{
-		isInSession: () => boolean;
-	}>();
+	const props = defineProps({
+		isInSession: {
+			type: Function as () => boolean,
+		},
+		chatMode: {
+			type: String,
+		},
+	});
 
 	// 输入框内的消息
 	const message = ref('');
 	const message_bk = ref('');
-
 	const isListening = ref(false);
 	const isStart = ref(false);
 	const timeOutEvent = ref<ReturnType<typeof setTimeout> | null>(null);
@@ -33,16 +37,22 @@
 
 	async function sendMessage() {
 		if (!props.isInSession()) {
-			emitter.emit('createNewSession');
+			emitter.emit('createNewSession', { chatMode: props.chatMode });
 		}
 		emit('send', message.value);
 		const userMessage = message.value;
 		const requestValue = { question: message.value };
 		emitter.emit('addSendMessage', { userMessage }); // 发送事件
 		message.value = '';
-		const data = await getReply(requestValue); // 获取答复内容
+		let data;
+		if (props.chatMode == 'work') {
+			data = await getReply(requestValue);
+		} else if (props.chatMode == 'chat') {
+			data = await getReplyChat(requestValue);
+		} else {
+			data = '后台异常';
+		}
 		emitter.emit('debugMS', { reply: data });
-		// const data = "这是机器人回复的示例内容。"; // 示例回复内容
 		emitter.emit('addReplyMessage', { replyMessage: data }); // 发送事件
 	}
 	function goTouchstart() {
@@ -59,18 +69,12 @@
 			isListening.value = false;
 			const wavBlob = record.getWAVBlob();
 			const newbolb = new Blob([wavBlob], { type: 'audio/wav' });
-			//获取当时时间戳作为文件名
 			const fileOfBlob = new File([newbolb], new Date().getTime() + '.wav');
 
 			const formData = new FormData();
-			formData.append('audio', fileOfBlob); // "file" 对应后端的字段名
+			formData.append('audio', fileOfBlob);
 			const data = await postText(formData);
-
-			// console.log(data);
-			// emitter.emit("debugMS", data);
 			setTimeout(() => {
-				// emitter.emit("debugMS", { setTimeout: data });
-				// message.value = data as never;
 				message_bk.value = data as never;
 				if (message_bk.value === '未接收到语音') {
 					ElMessage.warning({ message: message_bk.value });
@@ -80,7 +84,7 @@
 					return;
 				} else {
 					if (!props.isInSession()) {
-						emitter.emit('createNewSession');
+						emitter.emit('createNewSession', { chatMode: props.chatMode });
 					}
 					emit('send', data as never);
 				}
@@ -90,11 +94,15 @@
 			setTimeout(async () => {
 				const userMessage = message_bk.value;
 				const requestValue = { question: message_bk.value };
-				emitter.emit('addSendMessage', { userMessage }); // 发送事件
-				const data = await getReply(requestValue); // 获取答复内容
+				emitter.emit('addSendMessage', { userMessage });
+				let data;
+				if (props.chatMode == 'work') {
+					data = await getReply(requestValue);
+				} else if (props.chatMode == 'chat') {
+					data = await getReplyChat(requestValue);
+				}
 				emitter.emit('debugMS', data);
-				// const data = "这是机器人回复的示例内容。"; // 示例回复内容
-				emitter.emit('addReplyMessage', { replyMessage: data }); // 发送事件
+				emitter.emit('addReplyMessage', { replyMessage: data });
 			}, 300);
 		}
 	}
@@ -112,7 +120,7 @@
 		Recorder.getPermission().then(
 			() => {
 				console.log('开始录音');
-				record.start(); // 开始录音
+				record.start();
 			},
 			(error: any) => {
 				alert('无法获取麦克风权限');

@@ -4,6 +4,7 @@ export const chatSessionsData: ChatSession[] = [
     {
         id: 'session-1',
         topic: '雪碧',
+        mode: "chat",
         statistic: {
             chatCount: 2,
             tokenCount: 50,
@@ -46,6 +47,7 @@ export const chatSessionsData: ChatSession[] = [
     {
         id: 'session-2',
         topic: '可乐',
+        mode: "chat",
         statistic: {
             chatCount: 3,
             tokenCount: 70,
@@ -97,6 +99,7 @@ export const chatSessionsData: ChatSession[] = [
     {
         id: 'session-3',
         topic: '芬达',
+        mode: "chat",
         statistic: {
             chatCount: 2,
             tokenCount: 60,

@@ -1,31 +1,44 @@
 <!-- eslint-disable no-console -->
 <script lang="ts" setup>
 	import dayjs from 'dayjs';
-	import { nextTick, onMounted, ref, watch } from 'vue';
+	import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 	import { CirclePlus, Close, EditPen } from '@element-plus/icons-vue';
-	import { el } from 'element-plus/es/locales.mjs';
-
-	import type { ChatMessage, ChatSession } from '../../typings/types';
+	import type { ChatMessage, ChatSession, ChatMode } from '../../typings/types';
 	import { chatSessionsData } from '../../utils/virtualData';
 	import emitter from '../../utils/bus';
-
 	import MessageInput from '../chat/MessageInput.vue';
 	import MessageRow from '../chat/MessageRow.vue';
 	import FloatingWindow from '../FloatingWindow.vue';
 	import SessionItem from '../chat/SessionItem.vue';
+	// import { sendChatMsg, sendWorkMsg } from '@/api/chat-session'
 
 	const msgListRef = ref<HTMLElement | null>(null);
 	const isEdit = ref(false);
-	const activeSession = ref<Pick<ChatSession, 'id' | 'statistic' | 'messages' | 'topic' | 'mode'>>({
+
+	// 当前激活会话，类型直接使用ChatSession，空会话用初始默认对象
+	const activeSession = ref<ChatSession>({
 		id: '',
 		topic: '',
+		mode: 'chat',
 		statistic: { tokenCount: 0, wordCount: 0, chatCount: 0 },
 		messages: [],
-		mode: 'work',
+		createdBy: {
+			id: '',
+			avatar: '',
+			nickname: '',
+			username: '',
+			password: '',
+			updatedAt: '',
+			createdAt: '',
+			validStatus: 'VALID',
+		},
+		validStatus: 'VALID',
+		updatedAt: '',
+		createdAt: '',
 	});
 
-	const sessionList = ref([] as ChatSession[]);
-	const responseMessage = ref({} as ChatMessage);
+	const sessionList = ref<ChatSession[]>([]);
+	const responseMessage = ref<ChatMessage>({} as ChatMessage);
 	const userInfo = ref({
 		avatar: 'src/assets/avatar.png',
 		nickname: 'koko',
@@ -38,17 +51,17 @@
 		let cnt = 0;
 		emitter.on('debugMS', (data) => {
 			if (cnt < 10) {
-				debugMS.value.push(data as never);
+				debugMS.value.push(data);
 			} else {
 				debugMS.value.shift();
-				debugMS.value.push(data as never);
+				debugMS.value.push(data);
 			}
 			cnt = cnt + 1;
 		});
 
-		// 监听新增发送消息事件
+		// 监听新增用户消息
 		emitter.on('addSendMessage', (data: { userMessage: string; mode: ChatMode }) => {
-			const userMsg = {
+			const userMsg: ChatMessage = {
 				id: `msg-${Date.now()}`,
 				content: data.userMessage,
 				role: 'user',
@@ -57,16 +70,18 @@
 				updatedAt: dayjs().toISOString(),
 				validStatus: 'VALID',
 			};
-			activeSession.value.messages.push(userMsg as never);
-			let session = sessionList.value.find((s) => s.id === activeSession.value.id);
+			activeSession.value.messages.push(userMsg);
+			// 同步更新sessionList里原始会话数据
+			const session = sessionList.value.find((s) => s.id === activeSession.value.id);
 			if (session) {
 				session.messages = [...activeSession.value.messages];
 			}
+			scrollToBottom();
 		});
 
-		// 监听新增回复消息事件
+		// 监听AI回复消息
 		emitter.on('addReplyMessage', (data: { replyMessage: string }) => {
-			const replyMsg = {
+			const replyMsg: ChatMessage = {
 				id: `msg-${Date.now() + 1}`,
 				content: data.replyMessage,
 				role: 'assistant',
@@ -75,95 +90,25 @@
 				updatedAt: dayjs().toISOString(),
 				validStatus: 'VALID',
 			};
-			activeSession.value.messages.push(replyMsg as never);
-			let session = sessionList.value.find((s) => s.id === activeSession.value.id);
+			activeSession.value.messages.push(replyMsg);
+			const session = sessionList.value.find((s) => s.id === activeSession.value.id);
 			if (session) {
 				session.messages = [...activeSession.value.messages];
 			}
-		});
-
-		// 监听新建会话事件
-		emitter.on('createNewSession', (data: { ChatMode: string }) => {
-			const newSession = {
-				id: `session-${Date.now()}`,
-				topic: `新的聊天 ${sessionList.value.length + 1}`,
-				mode: data.ChatMode,
-				statistic: {
-					chatCount: 0,
-					tokenCount: 0,
-					wordCount: 0,
-				},
-				messages: [],
-				createdBy: {
-					id: 'user-0',
-					avatar: '/avatars/default.png',
-					nickname: '默认用户',
-					username: 'default_user',
-					password: 'default_password',
-					updatedAt: dayjs().toISOString(),
-					createdAt: dayjs().toISOString(),
-					validStatus: 'VALID',
-				},
-				validStatus: 'VALID',
-				updatedAt: dayjs().toISOString(),
-				createdAt: dayjs().toISOString(),
-			};
-			sessionList.value.unshift(newSession);
-			activeSession.value = newSession;
-		});
-	}
-
-	function scrollToBottom() {
-		nextTick(() => {
-			if (!msgListRef.value) return;
-			const dom = msgListRef.value;
-			dom.scrollTo({ top: dom.scrollHeight, behavior: 'smooth' });
-		});
-	}
-
-	onMounted(() => {
-		console.log('home-in');
-		emitterListen();
-
-		// sessionList.value.push(...chatSessionsData);
-		// queryChatSession({ pageSize: 1000, pageNum: 1, query: {} }).then((res) => {
-		// 	sessionList.value.push(...res.result.list);
-		// 	if (sessionList.value.length > 0) {
-		// 		activeSession.value = sessionList.value[0];
-		// 	}
-		// });
-	});
-
-	watch(
-		() => activeSession.value.messages.length,
-		() => {
-			const dom = msgListRef.value;
-			// watch 回调在 DOM 更新前执行，此时滚动位置仍是新增前的状态，可准确判断用户是否在底部附近
-			const isNearBottom = dom ? dom.scrollHeight - dom.scrollTop - dom.clientHeight < 20 : true;
-			if (isNearBottom) {
-				scrollToBottom();
-			}
-		},
-	);
-	// 切换会话
-	function handleSessionSwitch(session: ChatSession) {
-		activeSession.value = session;
-		nextTick(() => {
 			scrollToBottom();
 		});
-	}
-	// 从会话列表中删除会话
-	function handleDeleteSession(session: ChatSession) {
-		const index = sessionList.value.findIndex((value) => {
-			return value.id === session.id;
+
+		emitter.on('createNewSession', () => {
+			createNewSessionItem();
 		});
-		sessionList.value.splice(index, 1);
 	}
-	// 新增会话
-	function handleCreateSession() {
-		const newSession = {
+
+	/** 创建新会话 */
+	function createNewSessionItem() {
+		const newSession: ChatSession = {
 			id: `session-${Date.now()}`,
 			topic: `新的聊天 ${sessionList.value.length + 1}`,
+			mode: 'chat',
 			statistic: {
 				chatCount: 0,
 				tokenCount: 0,
@@ -184,8 +129,88 @@
 			updatedAt: dayjs().toISOString(),
 			createdAt: dayjs().toISOString(),
 		};
-		sessionList.value.unshift(newSession as never);
+		sessionList.value.unshift(newSession);
+		activeSession.value = newSession;
 	}
+
+	function scrollToBottom() {
+		nextTick(() => {
+			if (!msgListRef.value) return;
+			const dom = msgListRef.value;
+			dom.scrollTo({ top: dom.scrollHeight, behavior: 'smooth' });
+		});
+	}
+
+	onMounted(() => {
+		console.log('home-in');
+		emitterListen();
+		// sessionList.value.push(...chatSessionsData);
+		// if (sessionList.value.length > 0) {
+		//   activeSession.value = sessionList.value[0]
+		// }
+	});
+
+	onUnmounted(() => {
+		emitter.off('debugMS');
+		emitter.off('addSendMessage');
+		emitter.off('addReplyMessage');
+		emitter.off('createNewSession');
+	});
+
+	watch(
+		() => activeSession.value.messages.length,
+		() => {
+			const dom = msgListRef.value;
+			const isNearBottom = dom ? dom.scrollHeight - dom.scrollTop - dom.clientHeight < 50 : true;
+			if (isNearBottom) {
+				scrollToBottom();
+			}
+		},
+	);
+
+	// 切换会话
+	function handleSessionSwitch(session: ChatSession) {
+		activeSession.value = session;
+		nextTick(() => {
+			scrollToBottom();
+		});
+	}
+
+	// 删除会话
+	function handleDeleteSession(session: ChatSession) {
+		const index = sessionList.value.findIndex((value) => value.id === session.id);
+		sessionList.value.splice(index, 1);
+		// 如果删除的是当前会话，重置activeSession
+		if (activeSession.value.id === session.id) {
+			activeSession.value = {
+				id: '',
+				topic: '',
+				mode: 'chat',
+				statistic: { tokenCount: 0, wordCount: 0, chatCount: 0 },
+				messages: [],
+				createdBy: {
+					id: '',
+					avatar: '',
+					nickname: '',
+					username: '',
+					password: '',
+					updatedAt: '',
+					createdAt: '',
+					validStatus: 'VALID',
+				},
+				validStatus: 'VALID',
+				updatedAt: '',
+				createdAt: '',
+			};
+		}
+	}
+
+	// 新建会话按钮
+	function handleCreateSession() {
+		createNewSessionItem();
+	}
+
+	// 保存会话标题修改
 	function handleUpdateSession() {
 		const session = sessionList.value.find((s) => s.id === activeSession.value.id);
 		if (session) {
@@ -194,22 +219,56 @@
 		isEdit.value = false;
 	}
 
+	/**
+	 * 发送消息：区分 chat / work 模式请求后端不同接口
+	 */
+	async function handleSendMessage(message: string) {
+		if (!message.trim() || !activeSession.value.id) return;
+		const currentMode: ChatMode = activeSession.value.mode;
+		console.log('发送消息，mode:', currentMode, message);
+
+		emitter.emit('addSendMessage', {
+			userMessage: message,
+			mode: currentMode,
+		});
+
+		try {
+			let res: { reply: string };
+			if (currentMode === 'chat') {
+				// res = await sendChatMsg({
+				//   sessionId: activeSession.value.id,
+				//   content: message,
+				//   mode: 'chat',
+				// });
+				res = { reply: `【对话模式】收到消息：${message}` };
+			} else {
+				// res = await sendWorkMsg({
+				//   sessionId: activeSession.value.id,
+				//   content: message,
+				//   mode: 'work',
+				// });
+				res = { reply: `【工作模式】收到消息：${message}` };
+			}
+			emitter.emit('addReplyMessage', { replyMessage: res.reply });
+		} catch (err) {
+			console.error('请求失败', err);
+			emitter.emit('addReplyMessage', { replyMessage: '请求出错，请重试' });
+		}
+	}
+
 	function isInSession() {
-		return activeSession.value.id !== '';
+		return !!activeSession.value.id;
 	}
 </script>
 
 <template>
-	<!-- 最外层页面于窗口同宽，使聊天面板居中 -->
 	<div class="home-view">
-		<!-- 整个聊天面板 -->
 		<div class="chat-panel">
-			<!-- 左侧的会话列表 -->
+			<!-- 左侧会话列表 -->
 			<div class="session-panel">
 				<div class="title">ai-assistant</div>
 				<div class="description">构建你的AI助手</div>
 				<div class="session-list">
-					<!-- for循环遍历会话列表用会话组件显示，并监听点击事件和删除事件。点击时切换到被点击的会话，删除时从会话列表中提出被删除的会话。 -->
 					<SessionItem
 						v-for="(session, index) in sessionList"
 						:key="session.id"
@@ -231,41 +290,33 @@
 					</div>
 				</div>
 			</div>
-			<!-- 右侧的消息记录 -->
+			<!-- 右侧消息面板 -->
 			<div class="message-panel">
-				<!-- 会话名称 -->
 				<div class="header">
 					<div class="front">
-						<!-- 如果处于编辑状态则显示输入框让用户去修改 -->
 						<div v-if="isEdit" class="title">
-							<!-- 按回车代表确认修改 -->
 							<el-input v-model="activeSession.topic" @keydown.enter="handleUpdateSession" />
 						</div>
-						<!-- 否则正常显示标题 -->
 						<div v-else class="title">
 							{{ activeSession.topic }}
 						</div>
 						<div class="description">与ai-assistant的{{ activeSession.messages.length }}条对话</div>
+						<div class="mode-select" v-if="isInSession()">
+							<el-radio-group v-model="activeSession.mode" size="small">
+								<el-radio-button label="chat">对话</el-radio-button>
+								<el-radio-button label="work">工作</el-radio-button>
+							</el-radio-group>
+						</div>
 					</div>
-					<!-- 尾部的编辑按钮 -->
 					<div class="rear">
 						<el-icon :size="20">
-							<!-- 不处于编辑状态显示编辑按钮 -->
 							<EditPen v-if="!isEdit" @click="isEdit = true" />
-							<!-- 处于编辑状态显示取消编辑按钮 -->
 							<Close v-else @click="isEdit = false" />
 						</el-icon>
 					</div>
 				</div>
 				<el-divider border-style="solid" />
 				<div class="message-list" ref="msgListRef">
-					<div class="mode-select" v-if="!isInSession() || activeSession.messages.length == 0">
-						<el-radio-group v-model="activeSession.mode" size="big">
-							<el-radio-button label="chat">对话</el-radio-button>
-							<el-radio-button label="work">工作</el-radio-button>
-						</el-radio-group>
-					</div>
-					<!-- 过渡效果 -->
 					<transition-group name="list">
 						<MessageRow
 							v-for="(message, index) in activeSession.messages"
@@ -275,12 +326,7 @@
 						/>
 					</transition-group>
 				</div>
-				<!-- 监听发送事件 -->
-				<MessageInput
-					class="input-card"
-					:isInSession="isInSession"
-					:chatMode="activeSession.mode"
-				/>
+				<MessageInput class="input-card" @send="handleSendMessage" :isInSession="isInSession" />
 			</div>
 		</div>
 	</div>
@@ -293,15 +339,12 @@
 	.home-view {
 		width: 100%;
 		height: calc(100% - 2px);
-
 		.chat-panel {
 			height: 100%;
 			display: flex;
 			justify-content: center;
-			// border-radius: 20px;
 			background-color: white;
 			box-shadow: 0 0 20px 20px rgba(black, 0.05);
-
 			.session-panel {
 				width: 25%;
 				height: calc(100% - 40px);
@@ -311,40 +354,28 @@
 				position: relative;
 				border-right: 1px solid rgba(black, 0.07);
 				background-color: rgb(231, 248, 255);
-
-				/* 标题 */
 				.title {
 					margin-top: 20px;
 					font-size: 20px;
 					color: rgba(black, 0.7);
 				}
-
-				/* 描述*/
 				.description {
 					color: rgba(black, 0.7);
 					font-size: 14px;
 					margin-top: 10px;
 				}
-
 				.session-list {
 					.session {
-						/* 每个会话之间留一些间距 */
 						margin-top: 20px;
 					}
 				}
-
 				.button-wrapper {
-					/* session-panel是相对布局，这边的button-wrapper是相对它绝对布局 */
 					position: absolute;
 					bottom: 20px;
 					left: 0;
 					display: flex;
-					/* 让内部的按钮显示在右侧 */
 					justify-content: flex-end;
-					/* 宽度和session-panel一样宽*/
 					width: 100%;
-
-					/* 按钮于右侧边界留一些距离 */
 					.new-session {
 						margin-right: 20px;
 					}
@@ -358,7 +389,6 @@
 				border-top-left-radius: 5px;
 				display: flex;
 				flex-direction: column;
-
 				.header {
 					padding: 20px 20px 0 20px;
 					display: flex;
@@ -371,6 +401,9 @@
 						.description {
 							margin-top: 10px;
 							color: rgba(black, 0.5);
+						}
+						.mode-select {
+							margin-top: 12px;
 						}
 					}
 					.rear {
@@ -390,9 +423,6 @@
 					.list-leave-to {
 						opacity: 0;
 						transform: translateX(30px);
-					}
-					.mode-select {
-						margin-top: 12px;
 					}
 				}
 				.input-card {
